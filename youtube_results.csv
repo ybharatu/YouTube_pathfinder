@@ -1,14 +1,12 @@
-title,channel,views,url
-Python Tutorial For Beginners in Hindi | Complete Python Course 🔥,CodeWithHarry,18M views,https://www.youtube.com/watch?v=UrsmFxEIp5k
-Python Full Course for free 🐍,Bro Code,9.3M views,https://www.youtube.com/watch?v=ix9cRaBkVe0
-Python Full Course for free 🐍,Bro Code,21M views,https://www.youtube.com/watch?v=XKHEtdqhLK8
-Python in one video - Learn Complete Python in 2.5 Hours for Beginners 🔥| Full Course,Anuj Kumar Sharma,467K views,https://www.youtube.com/watch?v=L5sZ6WgOnj0
-Harvard CS50’s Introduction to Programming with Python – Full University Course,freeCodeCamp.org,8.1M views,https://www.youtube.com/watch?v=nLRL_NcnK-4
-Python Tutorial for Beginners - Full Course (with Notes & Practice Questions),Apna College,11M views,https://www.youtube.com/watch?v=ERCMXc8x7mc
-Python Full Course for Beginners,Programming with Mosh,47M views,https://www.youtube.com/watch?v=_uQrJ0TkZlc
-Python Tutorial for Beginners - Learn Python in 5 Hours [FULL COURSE],TechWorld with Nana,6.7M views,https://www.youtube.com/watch?v=t8pPdKYpowI
-15 Minute Python Tutorial For Beginners In Hindi (Full & Complete Python Crash Course),CodeWithHarry,2M views,https://www.youtube.com/watch?v=fr1f84rg4Nw
-Python Tutorial for Beginners (with mini-projects),freeCodeCamp.org,1M views,https://www.youtube.com/watch?v=qwAFL1597eM
-Learn Python in Only 30 Minutes (Beginner Tutorial),Indently,676K views,https://www.youtube.com/watch?v=Ro_MScTDfU4
-Python Tutorial for Beginners | Learn Python in 1.5 Hours,Apna College,11M views,https://www.youtube.com/watch?v=vLqTf2b6GZw
-Python for Beginners - Learn Coding with Python in 1 Hour,Programming with Mosh,24M views,https://www.youtube.com/watch?v=kqtD5dpn9C8
+title,channel,views,url,depth,recommended_from
+Python Full Course for free 🐍,Bro Code,9.3M views,https://www.youtube.com/watch?v=ix9cRaBkVe0,0,initial
+Python Full Course for Beginners to Advanced with AI (2026),The iScale,21K views,https://www.youtube.com/watch?v=FaC9RyS1Pk0,0,initial
+Python Full Course for free 🐍,Bro Code,21M views,https://www.youtube.com/watch?v=XKHEtdqhLK8,0,initial
+Harvard CS50’s Introduction to Programming with Python – Full University Course,freeCodeCamp.org,8.1M views,https://www.youtube.com/watch?v=nLRL_NcnK-4,0,initial
+Python Tutorial For Beginners in Hindi | Complete Python Course 🔥,CodeWithHarry,18M views,https://www.youtube.com/watch?v=UrsmFxEIp5k,0,initial
+Python Tutorial for Beginners - Learn Python in 5 Hours [FULL COURSE],TechWorld with Nana,6.7M views,https://www.youtube.com/watch?v=t8pPdKYpowI,0,initial
+Python Tutorial for Beginners 2026,Telusko,81K views,https://www.youtube.com/watch?v=j_JuhAWlEaI,0,initial
+Python Tutorial for Beginners (with mini-projects),freeCodeCamp.org,1M views,https://www.youtube.com/watch?v=qwAFL1597eM,0,initial
+Python Tutorial for Beginners - Full Course (with Notes & Practice Questions),Apna College,11M views,https://www.youtube.com/watch?v=ERCMXc8x7mc,0,initial
+Python Full Course | Python Tutorial for Beginners | Part 1 | Sagar Chouksey,Coding With Sagar,126K views,https://www.youtube.com/watch?v=qQEigNVHlX8,0,initial
+DevOps Roadmap - How to become a DevOps Engineer? What is DevOps?,,by TechWorld with Nana,https://www.youtube.com/watch?v=9pZ2xmsSDdo,1,Python Tutorial for Beginners - Learn Python in 5 Hours [FULL COURSE]
