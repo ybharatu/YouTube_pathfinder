@@ -13,6 +13,22 @@ def is_mostly_numeric(text):
     return digit_count > len(text) / 2
 
 
+def is_valid_title(title):
+    """Check if the title is valid (not purely numeric)"""
+    if not title:
+        return False
+    # Reject if purely numeric (like "128", "498", etc.)
+    if title.isdigit():
+        return False
+    # Reject if mostly numeric
+    if is_mostly_numeric(title):
+        return False
+    # Reject very short titles
+    if len(title) < 5:
+        return False
+    return True
+
+
 def parse_video_item(item, current_url):
     text = item.get('text', '')
     url = item.get('url', '')
@@ -113,6 +129,9 @@ def get_recommendations(driver, video, max_recs):
             if is_mostly_numeric(text_clean):
                 continue
             
+            if not is_valid_title(text_clean):
+                continue
+            
             if url == video["url"] or url in seen_urls_for_video:
                 continue
             seen_urls_for_video.add(url)
@@ -169,10 +188,7 @@ def search_youtube(query: str) -> None:
         current_depth_videos = []
         for item in raw_items:
             parsed = parse_video_item(item, "")
-            if parsed:
-                # Filter out entries that are mostly numeric (like "118", "128", etc.)
-                if is_mostly_numeric(parsed["title"]):
-                    continue
+            if parsed and is_valid_title(parsed.get("title", "")):
                 parsed["depth"] = 0
                 parsed["recommended_from"] = "initial"
                 current_depth_videos.append(parsed)

@@ -5,7 +5,12 @@ from youtube_graph import youtube_graph
 import sys
 
 
-DEPTH_COLORS = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6', '#f39c12', '#1abc9c']
+DEPTH_COLORS = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6', '#f39c12', '#1abc9c', '#e67e22', '#34495e']
+
+def get_depth_color(depth):
+    """Get color for a depth level, cycling through colors if needed"""
+    return DEPTH_COLORS[depth % len(DEPTH_COLORS)]
+
 MAX_LABEL_LENGTH = 100
 
 
@@ -29,7 +34,7 @@ def build_networkx_graph(youtube_graph):
     return G
 
 
-def visualize(graph, output_file='youtube_graph.pdf', figsize=(24, 18)):
+def visualize(graph, output_file='youtube_graph.pdf', figsize=(30, 24)):
     G = build_networkx_graph(graph)
     
     fig, ax = plt.subplots(figsize=figsize)
@@ -47,8 +52,8 @@ def visualize(graph, output_file='youtube_graph.pdf', figsize=(24, 18)):
         y = max_depth - depth
         x_spacing = 1.0 / (len(links) + 1)
         for i, link in enumerate(links):
-            # Add slight vertical stagger to avoid overlap
-            y_offset = (i % 3) * 0.05
+            # Add vertical stagger that increases with depth
+            y_offset = (i % 3) * 0.05 * (1 + depth * 0.3)
             pos[link] = ((i + 1) * x_spacing, y - y_offset)
     
     node_colors = [DEPTH_COLORS[G.nodes[n]['depth'] % len(DEPTH_COLORS)] for n in G.nodes()]
@@ -59,13 +64,13 @@ def visualize(graph, output_file='youtube_graph.pdf', figsize=(24, 18)):
                         alpha=0.6, arrowsize=10)
     
     nx.draw_networkx_nodes(G, pos, ax=ax, node_color=node_colors,
-                        node_size=300, alpha=0.9)
+                        node_size=150, alpha=0.9)
     
     labels = {n: G.nodes[n]['label'] for n in G.nodes()}
-    nx.draw_networkx_labels(G, pos, labels, ax=ax, font_size=5)
+    nx.draw_networkx_labels(G, pos, labels, ax=ax, font_size=3)
     
     legend_elements = [
-        mpatches.Patch(color=DEPTH_COLORS[i], label=f'Depth {i}')
+        mpatches.Patch(color=get_depth_color(i), label=f'Depth {i}')
         for i in range(max_depth + 1)
     ]
     ax.legend(handles=legend_elements, loc='upper right', fontsize=10)
