@@ -86,7 +86,21 @@ def visualize(graph, output_file='youtube_graph.pdf', figsize=(24, 18)):
     return output_file
 
 
+def print_graph_summary(graph):
+    print(f'Graph: {len(graph.nodes_by_title)} total nodes, depth {graph.depth}')
+    print(f'Heads (depth 0, initial search): {len(graph.heads)} videos')
+    
+    for i, head in enumerate(graph.heads):
+        print(f'  Head {i+1}: {head.title[:50]}... (channel: {head.channel}, views: {head.views})')
+        for child in head.children:
+            print(f'    -> {child.title[:40]}... (depth={child.depth}, from: {child.recfrom[:30]}...)')
+
+
 def main():
+    import sys
+    from youtube_graph import youtube_graph
+    from youtube_node import youtube_node
+    
     filename = 'youtube_results.csv'
     output_file = 'youtube_graph.pdf'
     
@@ -97,9 +111,13 @@ def main():
         output_file = sys.argv[2]
     
     print(f'Loading graph from: {filename}')
-    graph = create_graph_from_csv(filename)
+    graph = youtube_graph()
+    graph.load_from_csv(filename)
     
     print(f'Graph loaded: {len(graph.nodes_by_title)} nodes, depth {graph.depth}')
+    print()
+    print_graph_summary(graph)
+    print()
     print(f'Creating visualization: {output_file}')
     
     visualize(graph, output_file)

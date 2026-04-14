@@ -5,6 +5,14 @@ import csv
 import time
 
 
+def is_mostly_numeric(text):
+    """Check if more than half of the characters are digits"""
+    if not text:
+        return False
+    digit_count = sum(1 for c in text if c.isdigit())
+    return digit_count > len(text) / 2
+
+
 def parse_video_item(item, current_url):
     text = item.get('text', '')
     url = item.get('url', '')
@@ -102,6 +110,9 @@ def get_recommendations(driver, video, max_recs):
             if is_lesson_count:
                 continue
             
+            if is_mostly_numeric(text_clean):
+                continue
+            
             if url == video["url"] or url in seen_urls_for_video:
                 continue
             seen_urls_for_video.add(url)
@@ -131,7 +142,6 @@ def search_youtube(query: str) -> None:
     processed_urls = set()
     
     try:
-        # Get initial search results (depth 0)
         driver.get(f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}")
         time.sleep(8)
         
@@ -160,6 +170,9 @@ def search_youtube(query: str) -> None:
         for item in raw_items:
             parsed = parse_video_item(item, "")
             if parsed:
+                # Filter out entries that are mostly numeric (like "118", "128", etc.)
+                if is_mostly_numeric(parsed["title"]):
+                    continue
                 parsed["depth"] = 0
                 parsed["recommended_from"] = "initial"
                 current_depth_videos.append(parsed)
@@ -173,7 +186,6 @@ def search_youtube(query: str) -> None:
         
         print(f"Found {len(current_depth_videos)} depth 0 videos")
         
-        # Process each depth level
         for current_depth in range(1, DEPTH + 1):
             next_depth_videos = []
             
