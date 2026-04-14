@@ -106,6 +106,8 @@ python3 youtube_search.py
 - `youtube_node.py` - Node data structure for graph
 - `youtube_graph.py` - Graph data structure
 - `youtube_create_graph.py` - Create graph from CSV
+- `youtube_visualize_map.py` - Create visualization (PDF)
+- `youtube_graph.pdf` - Visualization output (generated)
 - `HELPME.md` - This file
 
 ## Graph Visualization
@@ -121,3 +123,18 @@ This creates a bidirectional graph showing:
 - Head nodes (depth 0, initial search results)
 - Recommendations by depth level
 - Links between parent and child videos
+
+## Visualization
+
+Create a PDF visualization of the graph:
+
+```bash
+python3 youtube_visualize_map.py                    # uses youtube_results.csv, saves youtube_graph.pdf
+python3 youtube_visualize_map.py input.csv     # custom input file
+python3 youtube_visualize_map.py input.csv output.pdf  # custom output
+```
+
+This creates a hierarchical visualization:
+- Nodes colored by depth level
+- Arrows showing parent → child relationships
+- Saved as PDF (youtube_graph.pdf by default)

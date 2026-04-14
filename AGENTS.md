@@ -42,3 +42,9 @@ The script collects recursively:
 python3 youtube_create_graph.py                    # uses youtube_results.csv
 python3 youtube_create_graph.py some_file.csv       # custom CSV file
 ```
+
+## Visualization Command
+```bash
+python3 youtube_visualize_map.py                    # creates youtube_graph.pdf
+python3 youtube_visualize_map.py input.csv output.pdf  # custom input/output
+```
