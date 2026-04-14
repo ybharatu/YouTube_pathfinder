@@ -1,6 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from settings import MAX_INITIAL, MAX_RECOMMENDATIONS, OUTPUT_FILE
+from settings import MAX_INITIAL, MAX_RECOMMENDATIONS, OUTPUT_FILE, DEPTH
 import csv
 import time
 
@@ -44,6 +44,82 @@ def parse_video_item(item, current_url):
     return None
 
 
+def get_recommendations(driver, video, max_recs):
+    try:
+        driver.get(video["url"])
+        time.sleep(6)
+        
+        try:
+            driver.execute_script("window.scrollTo(0, 300);")
+            time.sleep(2)
+            driver.execute_script("window.scrollTo(0, 800);")
+            time.sleep(2)
+        except:
+            pass
+        
+        rec_raw = driver.execute_script("""
+            var results = [];
+            var containers = document.querySelectorAll('#secondary, ytd-watch-next-secondary-results-renderer, #related');
+            for (var c = 0; c < containers.length; c++) {
+                var links = containers[c].querySelectorAll('a[href*="/watch?v="]');
+                for (var i = 0; i < links.length; i++) {
+                    if (links[i].href && links[i].href.indexOf('watch?v=') > -1) {
+                        var url = links[i].href.split('&')[0];
+                        results.push({text: links[i].innerText, url: url});
+                    }
+                }
+            }
+            return results;
+        """)
+        
+        rec_count = 0
+        seen_urls_for_video = set()
+        recommendations = []
+        
+        for item in rec_raw:
+            if rec_count >= max_recs:
+                break
+            
+            text = item.get('text', '')
+            url = item.get('url', '')
+            
+            text_clean = text.replace('\xa0', ' ').replace('\n', ' ').strip()
+            
+            if len(text_clean) < 10:
+                continue
+            
+            if text_clean[:5].isdigit():
+                continue
+            
+            if text_clean.count(':') > 1:
+                continue
+            
+            is_timestamp = any(c.isdigit() for c in text_clean[:8]) and ':' in text_clean
+            if is_timestamp:
+                continue
+            
+            is_lesson_count = 'lesson' in text_clean.lower() or 'chapter' in text_clean.lower()
+            if is_lesson_count:
+                continue
+            
+            if url == video["url"] or url in seen_urls_for_video:
+                continue
+            seen_urls_for_video.add(url)
+            
+            parsed = parse_video_item(item, video["url"])
+            if not parsed:
+                continue
+            
+            recommendations.append(parsed)
+            rec_count += 1
+        
+        return recommendations
+        
+    except Exception as e:
+        print(f"  Error: {e}")
+        return []
+
+
 def search_youtube(query: str) -> None:
     options = Options()
     options.add_argument("--start-maximized")
@@ -52,8 +128,10 @@ def search_youtube(query: str) -> None:
     driver = webdriver.Chrome(options=options)
     
     all_results = []
+    processed_urls = set()
     
     try:
+        # Get initial search results (depth 0)
         driver.get(f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}")
         time.sleep(8)
         
@@ -78,96 +156,47 @@ def search_youtube(query: str) -> None:
             return results;
         """)
         
-        initial_videos = []
+        current_depth_videos = []
         for item in raw_items:
             parsed = parse_video_item(item, "")
             if parsed:
                 parsed["depth"] = 0
                 parsed["recommended_from"] = "initial"
-                initial_videos.append(parsed)
+                current_depth_videos.append(parsed)
         
-        initial_videos = initial_videos[:MAX_INITIAL]
-        all_results.extend(initial_videos)
+        current_depth_videos = current_depth_videos[:MAX_INITIAL]
         
-        print(f"Found {len(initial_videos)} initial videos")
+        for video in current_depth_videos:
+            if video["url"] not in processed_urls:
+                all_results.append(video)
+                processed_urls.add(video["url"])
         
-        for video in initial_videos:
-            print(f"Getting recommendations from: {video['title'][:50]}...")
+        print(f"Found {len(current_depth_videos)} depth 0 videos")
+        
+        # Process each depth level
+        for current_depth in range(1, DEPTH + 1):
+            next_depth_videos = []
             
-            try:
-                driver.get(video["url"])
-                time.sleep(6)
+            for video in current_depth_videos:
+                print(f"Getting depth {current_depth} recommendations from: {video['title'][:50]}...")
                 
-                try:
-                    driver.execute_script("window.scrollTo(0, 300);")
-                    time.sleep(2)
-                    driver.execute_script("window.scrollTo(0, 800);")
-                    time.sleep(2)
-                except:
-                    pass
+                recommendations = get_recommendations(driver, video, MAX_RECOMMENDATIONS)
                 
-                rec_raw = driver.execute_script("""
-                    var results = [];
-                    var containers = document.querySelectorAll('#secondary, ytd-watch-next-secondary-results-renderer, #related');
-                    for (var c = 0; c < containers.length; c++) {
-                        var links = containers[c].querySelectorAll('a[href*="/watch?v="]');
-                        for (var i = 0; i < links.length; i++) {
-                            if (links[i].href && links[i].href.indexOf('watch?v=') > -1) {
-                                var url = links[i].href.split('&')[0];
-                                results.push({text: links[i].innerText, url: url});
-                            }
-                        }
-                    }
-                    return results;
-                """)
+                for rec in recommendations:
+                    rec["depth"] = current_depth
+                    rec["recommended_from"] = video["title"]
+                    
+                    if rec["url"] not in processed_urls:
+                        all_results.append(rec)
+                        processed_urls.add(rec["url"])
+                        next_depth_videos.append(rec)
                 
-                rec_count = 0
-                seen_urls = set()
-                seen_urls_for_video = set()
-                
-                for item in rec_raw:
-                    if rec_count >= MAX_RECOMMENDATIONS:
-                        break
-                    
-                    text = item.get('text', '')
-                    url = item.get('url', '')
-                    
-                    text_clean = text.replace('\xa0', ' ').replace('\n', ' ').strip()
-                    
-                    if len(text_clean) < 10:
-                        continue
-                    
-                    if text_clean[:5].isdigit():
-                        continue
-                    
-                    if text_clean.count(':') > 1:
-                        continue
-                    
-                    is_timestamp = any(c.isdigit() for c in text_clean[:8]) and ':' in text_clean
-                    if is_timestamp:
-                        continue
-                    
-                    is_lesson_count = 'lesson' in text_clean.lower() or 'chapter' in text_clean.lower()
-                    if is_lesson_count:
-                        continue
-                    
-                    if url == video["url"] or url in seen_urls_for_video:
-                        continue
-                    seen_urls_for_video.add(url)
-                    
-                    parsed = parse_video_item(item, video["url"])
-                    if not parsed:
-                        continue
-                    
-                    parsed["depth"] = 1
-                    parsed["recommended_from"] = video["title"]
-                    all_results.append(parsed)
-                    rec_count += 1
-                
-                print(f"  Found {rec_count} recommendations")
-                
-            except Exception as e:
-                print(f"  Error: {e}")
+                print(f"  Found {len(recommendations)} recommendations")
+            
+            current_depth_videos = next_depth_videos
+            
+            if not current_depth_videos:
+                break
         
         print(f"Total: {len(all_results)} video elements")
         
