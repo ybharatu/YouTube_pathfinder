@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from settings import MAX_INITIAL, MAX_RECOMMENDATIONS, OUTPUT_FILE
 import csv
 import time
 
@@ -24,27 +25,26 @@ def parse_video_item(item, current_url):
                     break
             break
     
-    if not title and len(lines) >= 3:
-        if 'views' in lines[1].lower():
-            title = lines[0]
-            views = lines[1]
-            channel = lines[2]
-        else:
-            title = lines[0]
-            views = lines[1]
-            channel = lines[2] if len(lines) > 2 else ""
-    
-    if not title and len(lines) >= 2:
+    if not title and len(lines) >= 1:
         title = lines[0]
-        views = lines[1]
-        channel = ""
+        
+    if not views and len(lines) >= 2:
+        if 'views' in lines[1].lower():
+            views = lines[1]
     
+    if not channel and len(lines) >= 2:
+        if 'views' not in lines[1].lower():
+            channel = lines[1]
+    
+    if not channel and len(lines) >= 3:
+        channel = lines[2]
+        
     if title and url and url != current_url:
         return {"title": title, "channel": channel, "views": views, "url": url}
     return None
 
 
-def search_youtube(query: str, output_file: str = "youtube_results.csv", max_initial: int = 10, max_recommendations: int = 10) -> None:
+def search_youtube(query: str) -> None:
     options = Options()
     options.add_argument("--start-maximized")
     options.add_argument("--disable-extensions")
@@ -86,7 +86,7 @@ def search_youtube(query: str, output_file: str = "youtube_results.csv", max_ini
                 parsed["recommended_from"] = "initial"
                 initial_videos.append(parsed)
         
-        initial_videos = initial_videos[:max_initial]
+        initial_videos = initial_videos[:MAX_INITIAL]
         all_results.extend(initial_videos)
         
         print(f"Found {len(initial_videos)} initial videos")
@@ -123,9 +123,10 @@ def search_youtube(query: str, output_file: str = "youtube_results.csv", max_ini
                 
                 rec_count = 0
                 seen_urls = set()
+                seen_urls_for_video = set()
                 
                 for item in rec_raw:
-                    if rec_count >= max_recommendations:
+                    if rec_count >= MAX_RECOMMENDATIONS:
                         break
                     
                     text = item.get('text', '')
@@ -133,25 +134,35 @@ def search_youtube(query: str, output_file: str = "youtube_results.csv", max_ini
                     
                     text_clean = text.replace('\xa0', ' ').replace('\n', ' ').strip()
                     
-                    if len(text_clean) < 15:
+                    if len(text_clean) < 10:
                         continue
                     
                     if text_clean[:5].isdigit():
                         continue
                     
-                    if ':' in text_clean[:15]:
+                    if text_clean.count(':') > 1:
                         continue
                     
-                    if url == video["url"] or url in seen_urls:
+                    is_timestamp = any(c.isdigit() for c in text_clean[:8]) and ':' in text_clean
+                    if is_timestamp:
                         continue
-                    seen_urls.add(url)
+                    
+                    is_lesson_count = 'lesson' in text_clean.lower() or 'chapter' in text_clean.lower()
+                    if is_lesson_count:
+                        continue
+                    
+                    if url == video["url"] or url in seen_urls_for_video:
+                        continue
+                    seen_urls_for_video.add(url)
                     
                     parsed = parse_video_item(item, video["url"])
-                    if parsed:
-                        parsed["depth"] = 1
-                        parsed["recommended_from"] = video["title"]
-                        all_results.append(parsed)
-                        rec_count += 1
+                    if not parsed:
+                        continue
+                    
+                    parsed["depth"] = 1
+                    parsed["recommended_from"] = video["title"]
+                    all_results.append(parsed)
+                    rec_count += 1
                 
                 print(f"  Found {rec_count} recommendations")
                 
@@ -160,16 +171,17 @@ def search_youtube(query: str, output_file: str = "youtube_results.csv", max_ini
         
         print(f"Total: {len(all_results)} video elements")
         
-        with open(output_file, "w", newline="", encoding="utf-8") as f:
+        with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=["title", "channel", "views", "url", "depth", "recommended_from"])
             writer.writeheader()
             writer.writerows(all_results)
         
-        print(f"Saved {len(all_results)} results to {output_file}")
+        print(f"Saved {len(all_results)} results to {OUTPUT_FILE}")
         time.sleep(2)
     finally:
         driver.quit()
 
 
 if __name__ == "__main__":
-    search_youtube("python tutorials")
+    from settings import SEARCH_QUERY
+    search_youtube(SEARCH_QUERY)
