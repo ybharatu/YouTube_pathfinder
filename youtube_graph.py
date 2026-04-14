@@ -13,7 +13,7 @@ class youtube_graph:
             reader = csv.DictReader(f)
             rows = list(reader)
         
-        # Create nodes for all rows
+        # Create nodes for all rows - use URL as unique key to handle duplicate titles
         for row in rows:
             node = youtube_node(
                 title=row['title'],
@@ -23,7 +23,8 @@ class youtube_graph:
                 depth=int(row['depth']),
                 link=row['url']
             )
-            self.nodes_by_title[node.title] = node
+            # Use URL as key to handle duplicate titles with different URLs
+            self.nodes_by_title[node.link] = node
             
             # Track max depth
             if node.depth > self.depth:
@@ -34,12 +35,16 @@ class youtube_graph:
             if node.depth == 0 and node.recfrom == 'initial':
                 self.heads.append(node)
         
-        # Build bidirectional links
+        # Build bidirectional links - use URL as key
         for node in self.nodes_by_title.values():
-            if node.recfrom != 'initial' and node.recfrom in self.nodes_by_title:
-                parent = self.nodes_by_title[node.recfrom]
-                node.parent = parent
-                parent.children.append(node)
+            if node.recfrom != 'initial':
+                # Find parent by matching title
+                for potential_parent in self.nodes_by_title.values():
+                    if potential_parent.title == node.recfrom:
+                        if potential_parent not in node.parents:
+                            node.parents.append(potential_parent)
+                        if node not in potential_parent.children:
+                            potential_parent.children.append(node)
     
     def __repr__(self):
         return f'youtube_graph(heads={len(self.heads)}, total_nodes={len(self.nodes_by_title)}, depth={self.depth})'

@@ -7,7 +7,12 @@ class youtube_node:
         self.depth = depth
         self.link = link
         self.children = []  # videos recommended from this node
-        self.parent = None   # bidirectional - what recommended this node
+        self.parents = []   # bidirectional - all videos that recommended this node
+    
+    @property
+    def parent(self):
+        """For backward compatibility - returns first parent or None"""
+        return self.parents[0] if self.parents else None
     
     def __repr__(self):
         return f'youtube_node(title={self.title[:30]}..., depth={self.depth}, channel={self.channel})'
