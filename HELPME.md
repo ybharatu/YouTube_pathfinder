@@ -6,8 +6,9 @@ A Selenium-based Python script to search YouTube and collect recommended videos.
 
 1. Searches YouTube for videos matching a query
 2. Collects initial videos from search results (depth=0)
-3. Visits each video and collects recommended videos (depth=1)
+3. For each depth level, visits videos and collects recommendations (depth=1, 2, etc.)
 4. Saves results to a CSV file with trackable depth and source
+5. Can create a graph visualization from the CSV
 
 ## Installation
 
@@ -39,6 +40,7 @@ Edit `settings.py` to customize:
 
 MAX_INITIAL = 3              # Number of videos from initial search
 MAX_RECOMMENDATIONS = 3        # Recommendations per video
+DEPTH = 2                   # Recursion depth (1 = initial only, 2 = depth-1 recs get recs, etc.)
 SEARCH_QUERY = "python tutorials"  # Your search query
 OUTPUT_FILE = "youtube_results.csv"  # Output filename
 ```
@@ -101,4 +103,21 @@ python3 youtube_search.py
 - `youtube_search.py` - Main script
 - `settings.py` - Configuration settings
 - `youtube_results.csv` - Output file (generated)
+- `youtube_node.py` - Node data structure for graph
+- `youtube_graph.py` - Graph data structure
+- `youtube_create_graph.py` - Create graph from CSV
 - `HELPME.md` - This file
+
+## Graph Visualization
+
+Create a graph from the CSV results:
+
+```bash
+python3 youtube_create_graph.py                    # uses youtube_results.csv
+python3 youtube_create_graph.py some_file.csv        # uses custom CSV file
+```
+
+This creates a bidirectional graph showing:
+- Head nodes (depth 0, initial search results)
+- Recommendations by depth level
+- Links between parent and child videos

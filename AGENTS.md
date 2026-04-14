@@ -31,5 +31,14 @@ The script collects recursively:
 ## Files
 - `settings.py` - Configuration
 - `youtube_search.py` - Main script
-- `youtube_results.csv` - Output
+- `youtube_results.csv` - Output CSV
+- `youtube_node.py` - Node data structure for graph
+- `youtube_graph.py` - Graph data structure
+- `youtube_create_graph.py` - Create graph from CSV
 - `HELPME.md` - User documentation
+
+## Graph Commands
+```bash
+python3 youtube_create_graph.py                    # uses youtube_results.csv
+python3 youtube_create_graph.py some_file.csv       # custom CSV file
+```
