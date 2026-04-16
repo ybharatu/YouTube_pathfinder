@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Pathfinder Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fafafa;
+            min-height: 100vh;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { color: #aaa; font-size: 1.1em; }
+        
+        .metric-row { 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px; 
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .metric { 
+            background: linear-gradient(145deg, #1e3a5f, #162447);
+            padding: 25px 40px; 
+            border-radius: 15px; 
+            text-align: center; 
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .metric-value { font-size: 2em; font-weight: bold; color: #4fc3f7; }
+        .metric-label { font-size: 0.9em; color: #aaa; margin-top: 5px; }
+        
+        .section { margin: 50px 0; }
+        .section h2 { 
+            border-bottom: 2px solid #4fc3f7; 
+            padding-bottom: 10px; 
+            margin-bottom: 25px;
+            color: #4fc3f7;
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+        }
+        .chart-container { 
+            background: rgba(255,255,255,0.03);
+            padding: 20px; 
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .chart-full { 
+            background: rgba(255,255,255,0.03);
+            padding: 20px; 
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .network-container {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-top: 20px;
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+            background: rgba(255,255,255,0.02);
+        }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: #162447; color: #4fc3f7; }
+        tr:hover { background: rgba(255,255,255,0.05); }
+        
+        .data-table-container {
+            max-height: 500px;
+            overflow: auto;
+            border-radius: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .chart-grid { grid-template-columns: 1fr; }
+            .metric-row { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 YouTube Pathfinder Dashboard</h1>
+        <p>Interactive Analysis of YouTube Video Recommendations</p>
+    </div>
+    
+    <div class="metric-row">
+        <div class="metric">
+            <div class="metric-value">77</div>
+            <div class="metric-label">Total Videos</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">932,963,711</div>
+            <div class="metric-label">Total Views</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">6</div>
+            <div class="metric-label">Max Depth</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">47</div>
+            <div class="metric-label">Unique Channels</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>📈 Views Analysis</h2>
+        <div class="chart-grid">
+            <div class="chart-container">
+                <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>                <div id="019b65dd-f93a-45f4-9ee9-5a065a5ffc3a" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("019b65dd-f93a-45f4-9ee9-5a065a5ffc3a")) {                    Plotly.newPlot(                        "019b65dd-f93a-45f4-9ee9-5a065a5ffc3a",                        [{"alignmentgroup":"True","hovertemplate":"Depth Level=%{x}<br>Average Views=%{y}<extra></extra>","legendgroup":"","marker":{"color":"#3498db","pattern":{"shape":""}},"name":"","offsetgroup":"","orientation":"v","showlegend":false,"textposition":"auto","x":["0","1","2","3","4","5","6"],"xaxis":"x","y":[1516227.0,202789.0,81608.75,6183217.285714285,1931113.3333333333,35318288.526315786,6037878.375],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Depth Level"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Average Views"},"tickformat":",.0f"},"legend":{"tracegroupgap":0},"title":{"text":"Average View Count at Each Depth"},"barmode":"relative"},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+            <div class="chart-container">
+                <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>                <div id="02d0cb38-f66e-40da-9f27-d44f147c38de" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("02d0cb38-f66e-40da-9f27-d44f147c38de")) {                    Plotly.newPlot(                        "02d0cb38-f66e-40da-9f27-d44f147c38de",                        [{"alignmentgroup":"True","hovertemplate":"Depth Level=%{x}<br>Total Views=%{y}<extra></extra>","legendgroup":"","marker":{"color":"#2ecc71","pattern":{"shape":""}},"name":"","offsetgroup":"","orientation":"v","showlegend":false,"textposition":"auto","x":["0","1","2","3","4","5","6"],"xaxis":"x","y":[1516227.0,405578.0,326435.0,43282521.0,23173360.0,671047482.0,193212108.0],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Depth Level"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Total Views"},"tickformat":",.0f"},"legend":{"tracegroupgap":0},"title":{"text":"Total View Count at Each Depth"},"barmode":"relative"},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>
+        <div class="chart-full">
+            <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>                <div id="d9a5ac74-b106-4533-a3ac-e9b47a7ce5ae" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("d9a5ac74-b106-4533-a3ac-e9b47a7ce5ae")) {                    Plotly.newPlot(                        "d9a5ac74-b106-4533-a3ac-e9b47a7ce5ae",                        [{"alignmentgroup":"True","hovertemplate":"Depth Level=%{x}<br>Views=%{y}<extra></extra>","legendgroup":"","marker":{"color":"#9b59b6"},"name":"","notched":false,"offsetgroup":"","orientation":"v","showlegend":false,"x":[0,1,1,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6],"x0":" ","xaxis":"x","y":[1516227.0,381413.0,24165.0,145370.0,133107.0,41531.0,6427.0,728275.0,21544675.0,16131.0,18536208.0,2423732.0,22328.0,11172.0,602472.0,231434.0,3012976.0,365843.0,530774.0,68811.0,6409361.0,3339469.0,2057939.0,454805.0,6081505.0,17971.0,604325.0,82937.0,11214547.0,217080.0,616767811.0,87800.0,117622.0,12972099.0,4784764.0,552033.0,348805.0,1728675.0,4822.0,9002.0,349996.0,5321479.0,15883291.0,267.0,127.0,61656.0,291081.0,93570.0,4958816.0,8890.0,224.0,13876120.0,53884408.0,1674.0,2143141.0,4231464.0,1389.0,20301260.0,3149659.0,600099.0,3302238.0,1912311.0,1919259.0,519558.0,1246820.0,8407027.0,2933677.0,27690.0,37711.0,514.0,143.0,10727119.0,44659946.0,13813220.0,1929.0,6331.0,93164.0],"y0":" ","yaxis":"y","type":"box"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Depth Level"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Views"},"tickformat":",.0f"},"legend":{"tracegroupgap":0},"title":{"text":"View Count Distribution by Depth"},"boxmode":"group"},                        {"responsive": true}                    )                };                            </script>        </div>
+        </div>
+        <div class="chart-full">
+            <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>                <div id="b86d4aa7-0f2e-4266-805a-dcb8bbe2fe41" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("b86d4aa7-0f2e-4266-805a-dcb8bbe2fe41")) {                    Plotly.newPlot(                        "b86d4aa7-0f2e-4266-805a-dcb8bbe2fe41",                        [{"line":{"color":"#3498db"},"mode":"lines+markers","name":"Mean Views","x":["0","1","2","3","4","5","6"],"y":[1516227.0,202789.0,81608.75,6183217.285714285,1931113.3333333333,35318288.526315786,6037878.375],"type":"scatter"},{"line":{"color":"#e74c3c"},"mode":"lines+markers","name":"Median Views","x":["0","1","2","3","4","5","6"],"y":[1516227.0,202789.0,87319.0,728275.0,566623.0,349996.0,923459.5],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"text":"Views Trend Across Depths"},"xaxis":{"title":{"text":"Depth"}},"yaxis":{"title":{"text":"Views"},"tickformat":",.0f"}},                        {"responsive": true}                    )                };                            </script>        </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>📂 Category Analysis</h2>
+        <div class="chart-grid">
+            <div class="chart-container">
+                <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>                <div id="8681a657-ff59-4068-94c6-041d544028c6" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("8681a657-ff59-4068-94c6-041d544028c6")) {                    Plotly.newPlot(                        "8681a657-ff59-4068-94c6-041d544028c6",                        [{"domain":{"x":[0.0,1.0],"y":[0.0,1.0]},"hovertemplate":"Category=%{label}<br>Count=%{value}<extra></extra>","labels":["Unknown"],"legendgroup":"","name":"","showlegend":true,"values":[77],"type":"pie"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"legend":{"tracegroupgap":0},"title":{"text":"Overall Category Distribution"}},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+            <div class="chart-container">
+                <div>                        <script type="text/javascript">window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"></script>                <div id="67c5c17f-d722-4b8a-a61f-e1cd3c026520" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script type="text/javascript">                                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("67c5c17f-d722-4b8a-a61f-e1cd3c026520")) {                    Plotly.newPlot(                        "67c5c17f-d722-4b8a-a61f-e1cd3c026520",                        [{"alignmentgroup":"True","hovertemplate":"category_name=Unknown<br>Depth=%{x}<br>Video Count=%{y}<extra></extra>","legendgroup":"Unknown","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"Unknown","offsetgroup":"Unknown","orientation":"v","showlegend":true,"textposition":"auto","x":[0,1,2,3,4,5,6],"xaxis":"x","y":[1,2,4,7,12,19,32],"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Depth"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Video Count"}},"legend":{"title":{"text":"category_name"},"tracegroupgap":0},"title":{"text":"Categories at Each Depth"},"barmode":"relative"},                        {"responsive": true}                    )                };                            </script>        </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>🌐 Network Map</h2>
+        <p style="color: #aaa; margin-bottom: 20px;">
+            Interactive network showing video recommendations. 
+            Nodes are colored by depth (red=0, blue=1, green=2, etc.) and sized by view count.
+        </p>
+        <div class="network-container">
+            <html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script>function neighbourhoodHighlight(params) {
+  // console.log("in nieghbourhoodhighlight");
+  allNodes = nodes.get({ returnType: "Object" });
+  // originalNodes = JSON.parse(JSON.stringify(allNodes));
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    highlightActive = true;
+    var i, j;
+    var selectedNode = params.nodes[0];
+    var degrees = 2;
+
+    // mark all nodes as hard to read.
+    for (let nodeId in allNodes) {
+      // nodeColors[nodeId] = allNodes[nodeId].color;
+      allNodes[nodeId].color = "rgba(200,200,200,0.5)";
+      if (allNodes[nodeId].hiddenLabel === undefined) {
+        allNodes[nodeId].hiddenLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+    var connectedNodes = network.getConnectedNodes(selectedNode);
+    var allConnectedNodes = [];
+
+    // get the second degree nodes
+    for (i = 1; i < degrees; i++) {
+      for (j = 0; j < connectedNodes.length; j++) {
+        allConnectedNodes = allConnectedNodes.concat(
+          network.getConnectedNodes(connectedNodes[j])
+        );
+      }
+    }
+
+    // all second degree nodes get a different color and their label back
+    for (i = 0; i < allConnectedNodes.length; i++) {
+      // allNodes[allConnectedNodes[i]].color = "pink";
+      allNodes[allConnectedNodes[i]].color = "rgba(150,150,150,0.75)";
+      if (allNodes[allConnectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[allConnectedNodes[i]].label =
+          allNodes[allConnectedNodes[i]].hiddenLabel;
+        allNodes[allConnectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // all first degree nodes get their own color and their label back
+    for (i = 0; i < connectedNodes.length; i++) {
+      // allNodes[connectedNodes[i]].color = undefined;
+      allNodes[connectedNodes[i]].color = nodeColors[connectedNodes[i]];
+      if (allNodes[connectedNodes[i]].hiddenLabel !== undefined) {
+        allNodes[connectedNodes[i]].label =
+          allNodes[connectedNodes[i]].hiddenLabel;
+        allNodes[connectedNodes[i]].hiddenLabel = undefined;
+      }
+    }
+
+    // the main node gets its own color and its label back.
+    // allNodes[selectedNode].color = undefined;
+    allNodes[selectedNode].color = nodeColors[selectedNode];
+    if (allNodes[selectedNode].hiddenLabel !== undefined) {
+      allNodes[selectedNode].label = allNodes[selectedNode].hiddenLabel;
+      allNodes[selectedNode].hiddenLabel = undefined;
+    }
+  } else if (highlightActive === true) {
+    // console.log("highlightActive was true");
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      // allNodes[nodeId].color = "purple";
+      allNodes[nodeId].color = nodeColors[nodeId];
+      // delete allNodes[nodeId].color;
+      if (allNodes[nodeId].hiddenLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].hiddenLabel;
+        allNodes[nodeId].hiddenLabel = undefined;
+      }
+    }
+    highlightActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    // console.log("Nothing was selected");
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        // console.log(allNodes[nodeId]);
+        // allNodes[nodeId].color = {};
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function filterHighlight(params) {
+  allNodes = nodes.get({ returnType: "Object" });
+  // if something is selected:
+  if (params.nodes.length > 0) {
+    filterActive = true;
+    let selectedNodes = params.nodes;
+
+    // hiding all nodes and saving the label
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = true;
+      if (allNodes[nodeId].savedLabel === undefined) {
+        allNodes[nodeId].savedLabel = allNodes[nodeId].label;
+        allNodes[nodeId].label = undefined;
+      }
+    }
+
+    for (let i=0; i < selectedNodes.length; i++) {
+      allNodes[selectedNodes[i]].hidden = false;
+      if (allNodes[selectedNodes[i]].savedLabel !== undefined) {
+        allNodes[selectedNodes[i]].label = allNodes[selectedNodes[i]].savedLabel;
+        allNodes[selectedNodes[i]].savedLabel = undefined;
+      }
+    }
+
+  } else if (filterActive === true) {
+    // reset all nodes
+    for (let nodeId in allNodes) {
+      allNodes[nodeId].hidden = false;
+      if (allNodes[nodeId].savedLabel !== undefined) {
+        allNodes[nodeId].label = allNodes[nodeId].savedLabel;
+        allNodes[nodeId].savedLabel = undefined;
+      }
+    }
+    filterActive = false;
+  }
+
+  // transform the object into an array
+  var updateArray = [];
+  if (params.nodes.length > 0) {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  } else {
+    for (let nodeId in allNodes) {
+      if (allNodes.hasOwnProperty(nodeId)) {
+        updateArray.push(allNodes[nodeId]);
+      }
+    }
+    nodes.update(updateArray);
+  }
+}
+
+function selectNode(nodes) {
+  network.selectNodes(nodes);
+  neighbourhoodHighlight({ nodes: nodes });
+  return nodes;
+}
+
+function selectNodes(nodes) {
+  network.selectNodes(nodes);
+  filterHighlight({nodes: nodes});
+  return nodes;
+}
+
+function highlightFilter(filter) {
+  let selectedNodes = []
+  let selectedProp = filter['property']
+  if (filter['item'] === 'node') {
+    let allNodes = nodes.get({ returnType: "Object" });
+    for (let nodeId in allNodes) {
+      if (allNodes[nodeId][selectedProp] && filter['value'].includes((allNodes[nodeId][selectedProp]).toString())) {
+        selectedNodes.push(nodeId)
+      }
+    }
+  }
+  else if (filter['item'] === 'edge'){
+    let allEdges = edges.get({returnType: 'object'});
+    // check if the selected property exists for selected edge and select the nodes connected to the edge
+    for (let edge in allEdges) {
+      if (allEdges[edge][selectedProp] && filter['value'].includes((allEdges[edge][selectedProp]).toString())) {
+        selectedNodes.push(allEdges[edge]['from'])
+        selectedNodes.push(allEdges[edge]['to'])
+      }
+    }
+  }
+  selectNodes(selectedNodes)
+}</script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+            
+            
+            
+            
+            
+
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #1a1a2e;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#e74c3c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=MiQe9ob9aDc", "label": "\ud83d\udd34 LIVE: Predator Battles: Lion...", "shape": "dot", "size": 40, "title": "\ud83d\udd34 LIVE: Predator Battles: Lions vs Leopards vs Hyenas | Savage Kingdom Livestream | Nat Geo Animals\u003cbr\u003eChannel: Nat Geo Animals\u003cbr\u003eViews: 1516227 views\u003cbr\u003eDepth: 0\u003cbr\u003eCategory: Unknown"}, {"color": "#3498db", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=wVd836vHl6s", "label": "\ud83d\udd34 LIVE: Exploring America\u0027s Na...", "shape": "dot", "size": 17.62826, "title": "\ud83d\udd34 LIVE: Exploring America\u0027s National Parks | Earth Month LIVESTREAM | National Geographic\u003cbr\u003eChannel: National Geographic\u003cbr\u003eViews: 381413 views\u003cbr\u003eDepth: 1\u003cbr\u003eCategory: Unknown"}, {"color": "#3498db", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=2wCQvdJyvGg", "label": "The Ocean Giants: The Largest ...", "shape": "dot", "size": 10.4833, "title": "The Ocean Giants: The Largest Creatures Hidden Beneath the Sea\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 24165 views\u003cbr\u003eDepth: 1\u003cbr\u003eCategory: Unknown"}, {"color": "#2ecc71", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=1LhlXiSc5NY", "label": "\ud83d\udd34 LIVE: The Incredible Wildlif...", "shape": "dot", "size": 12.907399999999999, "title": "\ud83d\udd34 LIVE: The Incredible Wildlife of Hidden Forests | BBC Earth\u003cbr\u003eChannel: BBC Earth\u003cbr\u003eViews: 145370 views\u003cbr\u003eDepth: 2\u003cbr\u003eCategory: Unknown"}, {"color": "#2ecc71", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=LeJ5ef6oQpI", "label": "4K Video UHD - PARADISE ISLAND...", "shape": "dot", "size": 12.66214, "title": "4K Video UHD - PARADISE ISLAND - Relaxing Music Along With Beautiful Nature Videos\u003cbr\u003eChannel: Enjoy Relaxation\u003cbr\u003eViews: 133107 views\u003cbr\u003eDepth: 2\u003cbr\u003eCategory: Unknown"}, {"color": "#2ecc71", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=-M2lgCtxkiE", "label": "From Here on InEveret AlmondFr...", "shape": "dot", "size": 10.83062, "title": "From Here on InEveret AlmondFrom Here on In\u003cbr\u003eChannel: Everet Almond - Topic\u003cbr\u003eViews: 41531 views\u003cbr\u003eDepth: 2\u003cbr\u003eCategory: Unknown"}, {"color": "#2ecc71", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=3aEEllYs9KQ", "label": "The Strait of Hormuz | The Wor...", "shape": "dot", "size": 10.12854, "title": "The Strait of Hormuz | The World\u2019s Most Critical Energy Lifeline\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 6427 views\u003cbr\u003eDepth: 2\u003cbr\u003eCategory: Unknown"}, {"color": "#f39c12", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=t3ljR4X05lM", "label": "Inside Africa\u2019s Most Dangerous...", "shape": "dot", "size": 24.5655, "title": "Inside Africa\u2019s Most Dangerous Jungle Where Survival Is Brutal\u003cbr\u003eChannel: Wild Realms Studio\u003cbr\u003eViews: 728275 views\u003cbr\u003eDepth: 3\u003cbr\u003eCategory: Unknown"}, {"color": "#f39c12", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=wKg71lcs5Nw", "label": "Relaxing Music to Relieve Stre...", "shape": "dot", "size": 40, "title": "Relaxing Music to Relieve Stress, Anxiety and Depression \u2022 Mind, Body \ud83d\udc2c Soothing music for nerves\u003cbr\u003eChannel: Soothing Soul\u003cbr\u003eViews: 21544675 views\u003cbr\u003eDepth: 3\u003cbr\u003eCategory: Unknown"}, {"color": "#f39c12", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=p84DkT_WcVI", "label": "The Best 4K Aquarium - Dive In...", "shape": "dot", "size": 10.32262, "title": "The Best 4K Aquarium - Dive Into The Mesmerizing Underwater Realm, Sea Jellyfish, Coral Reefs . #7\u003cbr\u003eChannel: AL Muzic Production\u003cbr\u003eViews: 16131 views\u003cbr\u003eDepth: 3\u003cbr\u003eCategory: Unknown"}, {"color": "#f39c12", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=xSS0cS1Jg-w", "label": "Best of Gibran Alcocer (Beauti...", "shape": "dot", "size": 40, "title": "Best of Gibran Alcocer (Beautiful Piano Mix)\u003cbr\u003eChannel: Kurate Music\u003cbr\u003eViews: 18536208 views\u003cbr\u003eDepth: 3\u003cbr\u003eCategory: Unknown"}, {"color": "#f39c12", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=g6VJUi6KuKY", "label": "Po\u0027s Funniest Training Scenes ...", "shape": "dot", "size": 40, "title": "Po\u0027s Funniest Training Scenes | Kung Fu Panda Movies | Family Flicks\u003cbr\u003eChannel: Family Flicks\u003cbr\u003eViews: 2423732 views\u003cbr\u003eDepth: 3\u003cbr\u003eCategory: Unknown"}, {"color": "#f39c12", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=JLT8sRrG0xw", "label": "MonthaholicSchwartzyMonthaholi...", "shape": "dot", "size": 10.44656, "title": "MonthaholicSchwartzyMonthaholic\u003cbr\u003eChannel: Release - Topic\u003cbr\u003eViews: 22328 views\u003cbr\u003eDepth: 3\u003cbr\u003eCategory: Unknown"}, {"color": "#f39c12", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=r6U6ghkO6gU", "label": "Antarctica Secrets | The Froze...", "shape": "dot", "size": 10.22344, "title": "Antarctica Secrets | The Frozen Continent Hiding Earth\u2019s Greatest Mysteries\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 11172 views\u003cbr\u003eDepth: 3\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=FdpraUoJ1A0", "label": "These Sea Creatures Shouldn\u2019t ...", "shape": "dot", "size": 22.04944, "title": "These Sea Creatures Shouldn\u2019t Be This Big\u003cbr\u003eChannel: Wild Realms Studio\u003cbr\u003eViews: 602472 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=7jvxbSA5mns", "label": "Deadly Venom: The Most Dangero...", "shape": "dot", "size": 14.62868, "title": "Deadly Venom: The Most Dangerous Creatures on Earth\u003cbr\u003eChannel: Wild Realms Studio\u003cbr\u003eViews: 231434 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=ItoNVjSmkx0", "label": "\ud83c\udf3f 4K Animal Kingdom \ud83c\udf0d Tranquil...", "shape": "dot", "size": 40, "title": "\ud83c\udf3f 4K Animal Kingdom \ud83c\udf0d Tranquil Wildlife Exploration with Calming Music\u003cbr\u003eChannel: Rhythm Emotion\u003cbr\u003eViews: 3012976 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=xEv2_YqDWyc", "label": "Healing of the Mind \ud83c\udf3f Bamboo W...", "shape": "dot", "size": 17.31686, "title": "Healing of the Mind \ud83c\udf3f Bamboo Water Sounds \u0026 Relaxing Music, Anxiety Relief\u003cbr\u003eChannel: Positive Healing Music\u003cbr\u003eViews: 365843 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=9Rp7Ddxzajs", "label": "Amazon\u2019s Hidden Beauties, Tiny...", "shape": "dot", "size": 20.615479999999998, "title": "Amazon\u2019s Hidden Beauties, Tiny Marvels of Nature \u2013 Unveiling the Most Beautiful Small Birds on Earth\u003cbr\u003eChannel: Gentle Breeze\u003cbr\u003eViews: 530774 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=K0quMymkFzI", "label": "most beautiful piano pieces (m...", "shape": "dot", "size": 11.37622, "title": "most beautiful piano pieces (mix)\u003cbr\u003eChannel: Kurate Music\u003cbr\u003eViews: 68811 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=CGdxQLIVt9M", "label": "\ud835\udc29\ud835\udc25\ud835\udc1a\ud835\udc32\ud835\udc25\ud835\udc22\ud835\udc2c\ud835\udc2d \ud835\udc1f\ud835\udc28\ud835\udc2b \ud835\udc2c\ud835\udc2d\ud835\udc2e\ud835\udc1d\ud835\udc32\ud835\udc22\ud835\udc27\ud835\udc20 | \ud835\udc1c\ud835\udc1a\ud835\udc25\ud835\udc26 \ud835\udc29...", "shape": "dot", "size": 40, "title": "\ud835\udc29\ud835\udc25\ud835\udc1a\ud835\udc32\ud835\udc25\ud835\udc22\ud835\udc2c\ud835\udc2d \ud835\udc1f\ud835\udc28\ud835\udc2b \ud835\udc2c\ud835\udc2d\ud835\udc2e\ud835\udc1d\ud835\udc32\ud835\udc22\ud835\udc27\ud835\udc20 | \ud835\udc1c\ud835\udc1a\ud835\udc25\ud835\udc26 \ud835\udc29\ud835\udc25\ud835\udc1a\ud835\udc32\ud835\udc25\ud835\udc22\ud835\udc2c\ud835\udc2d \ud835\udc2d\ud835\udc28 \ud835\udc2b\ud835\udc1e\ud835\udc25\ud835\udc1a\ud835\udc31 | \ud835\udc06\ud835\udc22\ud835\udc1b\ud835\udc2b\ud835\udc1a\ud835\udc27 \ud835\udc00\ud835\udc25\ud835\udc1c\ud835\udc28\ud835\udc1c\ud835\udc1e\ud835\udc2b \ud835\udc29\ud835\udc25\ud835\udc1a\ud835\udc32\ud835\udc25\ud835\udc22\ud835\udc2c\ud835\udc2d \ud83d\udd6f\ufe0f\u003cbr\u003eChannel: full of tension \u003cbr\u003eViews: 6409361 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=rSNQ4fXq75U", "label": "The Dragon Warriors Training! ...", "shape": "dot", "size": 40, "title": "The Dragon Warriors Training! \ud83d\udc4a | Kung Fu Panda | Adventure \u0026 Play\u003cbr\u003eChannel: Mini Moments - Adventure \u0026 Play\u003cbr\u003eViews: 3339469 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=HKMsG0Rueu0", "label": "Po Meets His Long Lost Dad! \ud83d\udc3c ...", "shape": "dot", "size": 40, "title": "Po Meets His Long Lost Dad! \ud83d\udc3c KUNG FU PANDA 3 | Animal Friends\u003cbr\u003eChannel: Mini Moments - Animal Friends\u003cbr\u003eViews: 2057939 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=EJ1muHSpFss", "label": "EXTREMELY POWERFUL Weapons Tha...", "shape": "dot", "size": 19.0961, "title": "EXTREMELY POWERFUL Weapons That Changed The War \ud83d\udca5 | Kurukshetra | Netflix India\u003cbr\u003eChannel: Netflix India\u003cbr\u003eViews: 454805 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=v2H1s9gj5DA", "label": "Interstellar | Docking Scene (...", "shape": "dot", "size": 40, "title": "Interstellar | Docking Scene (Matthew McConaughey, Matt Damon, Anne Hathaway) | Paramount Movies\u003cbr\u003eChannel: Paramount Movies\u003cbr\u003eViews: 6081505 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#9b59b6", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=sfvdDvZQA1M", "label": "The Strait of Hormuz: The Most...", "shape": "dot", "size": 10.35942, "title": "The Strait of Hormuz: The Most Important Oil Route in the World\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 17971 views\u003cbr\u003eDepth: 4\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=IO4-j7BC6dA", "label": "No Warning. No Escape. The Mos...", "shape": "dot", "size": 22.0865, "title": "No Warning. No Escape. The Most Feared Predators in the Wild\u003cbr\u003eChannel: Wild Realms Studio\u003cbr\u003eViews: 604325 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=ZqqGDt2KT8w", "label": "These Creatures Have Ruled Chi...", "shape": "dot", "size": 11.65874, "title": "These Creatures Have Ruled China\u2019s Mountains for Thousands of Years\u003cbr\u003eChannel: Wild Realms Studio\u003cbr\u003eViews: 82937 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=Ap8jTCMK3c4", "label": "Jungles: Survival of the Fitte...", "shape": "dot", "size": 40, "title": "Jungles: Survival of the Fittest (Full Episode) | Hostile Planet\u003cbr\u003eChannel: National Geographic\u003cbr\u003eViews: 11214547 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=OBzfYLF4mI4", "label": "The Hidden Beauty of Wild Bird...", "shape": "dot", "size": 14.3416, "title": "The Hidden Beauty of Wild Birds in Spring Wonderland \ud83c\udf38\u2728 Nature\u2019s Living Jewels in Stunning Detail\u003cbr\u003eChannel: RainBird Melody\u003cbr\u003eViews: 217080 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=5oH9Nr3bKfw", "label": "Tom \u0026 Jerry | A Bit of Fresh A...", "shape": "dot", "size": 40, "title": "Tom \u0026 Jerry | A Bit of Fresh Air! | Classic Cartoon Compilation | @WB Kids\u003cbr\u003eChannel: WB Kids\u003cbr\u003eViews: 616767811 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=5JMpuh9BR6U", "label": "Nature\u2019s Tiny Marvels: The Mos...", "shape": "dot", "size": 11.756, "title": "Nature\u2019s Tiny Marvels: The Most Colorful Small Birds and Their Enchanting Songs\u003cbr\u003eChannel: Gentle Breeze\u003cbr\u003eViews: 87800 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=V_jQ81v_xf8", "label": "Cosmic Piano Waltzes - 20 min ...", "shape": "dot", "size": 12.35244, "title": "Cosmic Piano Waltzes - 20 min Relaxing Piano (by James Malikey)\u003cbr\u003eChannel: James Malikey\u003cbr\u003eViews: 117622 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=NfOg7uNLolA", "label": "Idea 10 (Slowed \u0026 Reverb)Gibra...", "shape": "dot", "size": 40, "title": "Idea 10 (Slowed \u0026 Reverb)Gibran AlcocerIdea 10\u003cbr\u003eChannel: Gibran Alcocer - Topic\u003cbr\u003eViews: 12972099 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=HagoDidoFMw", "label": "Idea 1 Gibran AlcocerIdea 1", "shape": "dot", "size": 40, "title": "Idea 1 Gibran AlcocerIdea 1\u003cbr\u003eChannel: Gibran Alcocer - Topic\u003cbr\u003eViews: 4784764 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=uZX8trFzyl4", "label": "Po Becomes the Dragon Warrior!...", "shape": "dot", "size": 21.04066, "title": "Po Becomes the Dragon Warrior!  \ud83d\udc3c | Kung Fu Panda | Extended Preview | Mini Moments\u003cbr\u003eChannel: Mini Moments \u003cbr\u003eViews: 552033 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=5AMGLvROqsg", "label": "Learn English with Disney\u0027s CO...", "shape": "dot", "size": 16.9761, "title": "Learn English with Disney\u0027s COCO \u2014 Crossing the Flower Bridge\u003cbr\u003eChannel: Learn English With TV Series\u003cbr\u003eViews: 348805 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=Ii7o-ZSr35c", "label": "The ULTIMATE Kung Fu Panda 2 C...", "shape": "dot", "size": 40, "title": "The ULTIMATE Kung Fu Panda 2 Compilation! \ud83d\udc3c | Kung Fu Panda 2  | Adventure \u0026 Play\u003cbr\u003eChannel: Mini Moments - Adventure \u0026 Play\u003cbr\u003eViews: 1728675 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=yTD-QJfmEGc", "label": "\ud83d\udd34 Gecko\u0027s Garage Live Episodes...", "shape": "dot", "size": 10.09644, "title": "\ud83d\udd34 Gecko\u0027s Garage Live Episodes \ud83d\udd34\u003cbr\u003eChannel: Go Gecko\u0027s Garage!\u003cbr\u003eViews: 4822 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=fW2PPdn--ug", "label": "LIVE-Special from Belgium | 5-...", "shape": "dot", "size": 10.18004, "title": "LIVE-Special from Belgium | 5-HOUR study with me in Gent \ud83d\udcda\u26c8\ufe0f rain sounds \u0026 pomodoro timer 60 \u0026 10\u003cbr\u003eChannel: Pascal Zoels\u003cbr\u003eViews: 9002 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=5spxCrKFofM", "label": "\u0928\u093f\u0936\u093e\u0928\u093e \u0928\u0939\u0940\u0902 \u091a\u0942\u0915\u093e\u2026 \u0930\u093f\u0936\u094d\u0924\u093e \u092c\u0940\u091a \u092e...", "shape": "dot", "size": 16.99992, "title": "\u0928\u093f\u0936\u093e\u0928\u093e \u0928\u0939\u0940\u0902 \u091a\u0942\u0915\u093e\u2026 \u0930\u093f\u0936\u094d\u0924\u093e \u092c\u0940\u091a \u092e\u0947\u0902 \u0906 \u0917\u092f\u093e \ud83d\udd25| Bajirao Mastani Best Dialogue | Ranveer Singh\u003cbr\u003eChannel: Eros Universe Bollywood Stories\u003cbr\u003eViews: 349996 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=Rvns5DaW-ug", "label": "Interstellar | Murph Saves The...", "shape": "dot", "size": 40, "title": "Interstellar | Murph Saves The World (Full Scene) | Paramount Movies\u003cbr\u003eChannel: Paramount Movies\u003cbr\u003eViews: 5321479 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=ZyYqyYAKGC0", "label": "Time Is But a Stubborn Illusio...", "shape": "dot", "size": 40, "title": "Time Is But a Stubborn Illusion - Sneak Peek | Genius\u003cbr\u003eChannel: National Geographic\u003cbr\u003eViews: 15883291 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=ECQs4_0m-4Y", "label": "Pacific Ocean: The Largest and...", "shape": "dot", "size": 10.00534, "title": "Pacific Ocean: The Largest and Most Mysterious Waters on Earth\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 267 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#1abc9c", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=ANO4O5-3RI4", "label": "Bermuda Triangle | What Are Sc...", "shape": "dot", "size": 10.00254, "title": "Bermuda Triangle | What Are Scientists Discovering There?\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 127 views\u003cbr\u003eDepth: 5\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=rtgVcSu7IY8", "label": "Instrumental Worship Guitar : ...", "shape": "dot", "size": 11.23312, "title": "Instrumental Worship Guitar : Best Worship Song | Peaceful, Relaxing Instrumental Hymns on Guitar\u003cbr\u003eChannel: Sacred Guitar\u003cbr\u003eViews: 61656 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=FiZ1Gz7Uhgo", "label": "Indochina\u2019s Wild Heart \u2013 Life ...", "shape": "dot", "size": 15.82162, "title": "Indochina\u2019s Wild Heart \u2013 Life in the Realm of the Monsoon | Free Documentary Nature\u003cbr\u003eChannel: Free Documentary - Nature\u003cbr\u003eViews: 291081 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=q6h2iU-5byk", "label": "Good Morning America Full Broa...", "shape": "dot", "size": 11.8714, "title": "Good Morning America Full Broadcast - Monday, April 13, 2026\u003cbr\u003eChannel: ABC News\u003cbr\u003eViews: 93570 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=4p68-lMrjYU", "label": "Surviving the Grasslands (Full...", "shape": "dot", "size": 40, "title": "Surviving the Grasslands (Full Episode) | Hostile Planet\u003cbr\u003eChannel: National Geographic\u003cbr\u003eViews: 4958816 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=yyvzht3NFpE", "label": "\ud83d\udd34 24/7 Nature Documentaries  \ud83d\udd34...", "shape": "dot", "size": 10.1778, "title": "\ud83d\udd34 24/7 Nature Documentaries  \ud83d\udd34 | Incredible Animals from the Wild | STREAM  @UltimateNatureDocs\u003cbr\u003eChannel: Ultimate Nature Documentaries\u003cbr\u003eViews: 8890 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=I7Uk3xuc4z8", "label": "\ud83c\udf0a Deep Sea Wonders: Colorful O...", "shape": "dot", "size": 10.00448, "title": "\ud83c\udf0a Deep Sea Wonders: Colorful Ocean Life \u0026 Relaxing Music (24/7 Live)\u003cbr\u003eChannel: Restful Nature Hub\u003cbr\u003eViews: 224 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=PDh4gvb85ww", "label": "Tom \u0026 Jerry | Rivalry of the C...", "shape": "dot", "size": 40, "title": "Tom \u0026 Jerry | Rivalry of the Century | Classic Cartoon Compilation | WB Kids\u003cbr\u003eChannel: WB Kids\u003cbr\u003eViews: 13876120 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=WxDC1vRlA4A", "label": "Tom \u0026 Jerry in italiano | In V...", "shape": "dot", "size": 40, "title": "Tom \u0026 Jerry in italiano | In Vena Di Amare | WB Kids\u003cbr\u003eChannel: WB Kids Italiano\u003cbr\u003eViews: 53884408 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=QJemGYW6gvA", "label": "Open Window by the Emerald Lak...", "shape": "dot", "size": 10.03348, "title": "Open Window by the Emerald Lake \ud83c\udf43 Birdsong and Water Ambience for Calm and Focus\u003cbr\u003eChannel: Spring Backyard\u003cbr\u003eViews: 1674 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=KW8vZY9pW7k", "label": "Alaska\u2019s Untamed Beauty 4K: Un...", "shape": "dot", "size": 40, "title": "Alaska\u2019s Untamed Beauty 4K: Untouched Wilderness \u0026 Incredible Wildlife\u003cbr\u003eChannel: 4k Scenic Nature Film\u003cbr\u003eViews: 2143141 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=UKbZ4r88z3Q", "label": "The quiet beauty of everyday l...", "shape": "dot", "size": 40, "title": "The quiet beauty of everyday life | Piano Playlist\u003cbr\u003eChannel: James Quinn\u003cbr\u003eViews: 4231464 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=1be17xK3O4c", "label": "ETHEREAL SILVER - James Malike...", "shape": "dot", "size": 10.02778, "title": "ETHEREAL SILVER - James Malikey | Piano Tutorial\u003cbr\u003eChannel: CHRIS MUHAMA\u003cbr\u003eViews: 1389 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=5OIeIaAhQOg", "label": "Idea 10Gibran AlcocerIdea 10", "shape": "dot", "size": 40, "title": "Idea 10Gibran AlcocerIdea 10\u003cbr\u003eChannel: Kurate Music\u003cbr\u003eViews: 20301260 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=GNJE__4ZtvE", "label": "Gibran Alcocer - All ideas pla...", "shape": "dot", "size": 40, "title": "Gibran Alcocer - All ideas playlist (1 Hour + Rain)\u003cbr\u003eChannel: Dreamland\u003cbr\u003eViews: 3149659 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=n0E-2juRHuI", "label": "background", "shape": "dot", "size": 22.001980000000003, "title": "background\u003cbr\u003eChannel: Tony Anderson\u003cbr\u003eViews: 600099 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=QzlcxmVBIFo", "label": "Gibran Alcocer - Idea 1", "shape": "dot", "size": 40, "title": "Gibran Alcocer - Idea 1\u003cbr\u003eChannel: Kurate Music\u003cbr\u003eViews: 3302238 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=eDbBDeb_3g8", "label": "The Best of Kung Fu Panda 1-3 ...", "shape": "dot", "size": 40, "title": "The Best of Kung Fu Panda 1-3 \ud83d\udc3c | Extended Preview | Mini Moments\u003cbr\u003eChannel: Mini Moments \u003cbr\u003eViews: 1912311 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=LtXp4RGuq_o", "label": "How Po Became the Dragon Warri...", "shape": "dot", "size": 40, "title": "How Po Became the Dragon Warrior - Full Story \ud83d\udc3c \ud83d\udc09 | Kung Fu Panda | Adventure \u0026 Play\u003cbr\u003eChannel: Mini Moments - Adventure \u0026 Play\u003cbr\u003eViews: 1919259 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=2mWsO1CmJEc", "label": "Learn English with TANGLED \u2014 R...", "shape": "dot", "size": 20.39116, "title": "Learn English with TANGLED \u2014 Rapunzel Heals Flynn\u003cbr\u003eChannel: Learn English With TV Series\u003cbr\u003eViews: 519558 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=-uaMjhpi12M", "label": "History for Kids", "shape": "dot", "size": 34.9364, "title": "History for Kids\u003cbr\u003eChannel: Homeschool Pop\u003cbr\u003eViews: 1246820 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=ErUZVWUP0c4", "label": "Everything About Solar System ...", "shape": "dot", "size": 40, "title": "Everything About Solar System | Solar System Explained | The Dr Binocs Show | Peekaboo Kidz\u003cbr\u003eChannel: Peekaboo Kidz\u003cbr\u003eViews: 8407027 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=C6hI2WB3wH8", "label": "\ud83d\udd34 LIVE - BONNES VACANCES TOM E...", "shape": "dot", "size": 40, "title": "\ud83d\udd34 LIVE - BONNES VACANCES TOM ET JERRY  ! \u26f7\ufe0f\ud83c\udfd4\ufe0f | COMPILATION \u00c9PISODES NON STOP \ud83d\udd34 @CartoonitoFrance\u003cbr\u003eChannel: Cartoonito France\u003cbr\u003eViews: 2933677 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=lCKvrGr0UxY", "label": "https://youtu.be/lCKvrGr0UxY", "shape": "dot", "size": 10.5538, "title": "https://youtu.be/lCKvrGr0UxY\u003cbr\u003eChannel: Pascal Zoels\u003cbr\u003eViews: 27690 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=v4dMkYdaipU", "label": "https://youtu.be/v4dMkYdaipU", "shape": "dot", "size": 10.75422, "title": "https://youtu.be/v4dMkYdaipU\u003cbr\u003eChannel: Pascal Zoels\u003cbr\u003eViews: 37711 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=q35D-fy9XMw", "label": "\u092e\u0948\u0902  Married \u0939\u0942 \u092f\u0947 \u0917\u0932\u0924 \u0939\u0948 \ud83d\udc94 | ...", "shape": "dot", "size": 10.01028, "title": "\u092e\u0948\u0902  Married \u0939\u0942 \u092f\u0947 \u0917\u0932\u0924 \u0939\u0948 \ud83d\udc94 | Rockstar Best Romantic Scene | Ranbir Kapoor | Nargis Fakhri\u003cbr\u003eChannel: Eros Universe Bollywood Stories\u003cbr\u003eViews: 514 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=54BYy18SL7I", "label": "Desi Mike Tyson Moment \ud83d\udd25 | Vin...", "shape": "dot", "size": 10.00286, "title": "Desi Mike Tyson Moment \ud83d\udd25 | Vineet Kumar Singh, Jimmy Shergill, Zoya Hussian | Mukkabaaz\u003cbr\u003eChannel: Eros Universe Bollywood Stories\u003cbr\u003eViews: 143 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=60h6lpnSgck", "label": "Interstellar | \u201cTidal Wave\" Fu...", "shape": "dot", "size": 40, "title": "Interstellar | \u201cTidal Wave\" Full Scene (Anne Hathaway, Matthew McConaughey) | Paramount Movies\u003cbr\u003eChannel: Paramount Movies\u003cbr\u003eViews: 10727119 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=cTQ3Ko9ZKg8", "label": "Our Planet | Frozen Worlds | F...", "shape": "dot", "size": 40, "title": "Our Planet | Frozen Worlds | FULL EPISODE | Netflix\u003cbr\u003eChannel: Netflix\u003cbr\u003eViews: 44659946 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=qxjPjPzQ1iU", "label": "War for the Planet of the Apes...", "shape": "dot", "size": 40, "title": "War for the Planet of the Apes | Final Trailer | 20th Century FOX\u003cbr\u003eChannel: Planet of the Apes\u003cbr\u003eViews: 13813220 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=En6NRJpIVdE", "label": "Drake Passage: The Most Unforg...", "shape": "dot", "size": 10.03858, "title": "Drake Passage: The Most Unforgiving Waters on Earth\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 1929 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=uZuOUWGB9GM", "label": "Beneath Mariana | The Deep Sea...", "shape": "dot", "size": 10.12662, "title": "Beneath Mariana | The Deep Sea Mysteries No One Talks About\u003cbr\u003eChannel: Top Unreal Journeys\u003cbr\u003eViews: 6331 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}, {"color": "#e67e22", "font": {"color": "white"}, "id": "https://www.youtube.com/watch?v=Tf56Z_jqZLY", "label": "Sleep Music No. 1Chris HaugenS...", "shape": "dot", "size": 11.86328, "title": "Sleep Music No. 1Chris HaugenSleep Music No. 1\u003cbr\u003eChannel: Chris Haugen - Topic\u003cbr\u003eViews: 93164 views\u003cbr\u003eDepth: 6\u003cbr\u003eCategory: Unknown"}]);
+                  edges = new vis.DataSet([{"color": "gray", "from": "https://www.youtube.com/watch?v=MiQe9ob9aDc", "to": "https://www.youtube.com/watch?v=wVd836vHl6s"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=MiQe9ob9aDc", "to": "https://www.youtube.com/watch?v=2wCQvdJyvGg"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=wVd836vHl6s", "to": "https://www.youtube.com/watch?v=1LhlXiSc5NY"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=wVd836vHl6s", "to": "https://www.youtube.com/watch?v=LeJ5ef6oQpI"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=2wCQvdJyvGg", "to": "https://www.youtube.com/watch?v=-M2lgCtxkiE"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=2wCQvdJyvGg", "to": "https://www.youtube.com/watch?v=3aEEllYs9KQ"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=1LhlXiSc5NY", "to": "https://www.youtube.com/watch?v=t3ljR4X05lM"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=1LhlXiSc5NY", "to": "https://www.youtube.com/watch?v=wKg71lcs5Nw"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=LeJ5ef6oQpI", "to": "https://www.youtube.com/watch?v=p84DkT_WcVI"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=-M2lgCtxkiE", "to": "https://www.youtube.com/watch?v=xSS0cS1Jg-w"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=-M2lgCtxkiE", "to": "https://www.youtube.com/watch?v=g6VJUi6KuKY"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=3aEEllYs9KQ", "to": "https://www.youtube.com/watch?v=JLT8sRrG0xw"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=3aEEllYs9KQ", "to": "https://www.youtube.com/watch?v=r6U6ghkO6gU"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=t3ljR4X05lM", "to": "https://www.youtube.com/watch?v=FdpraUoJ1A0"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=t3ljR4X05lM", "to": "https://www.youtube.com/watch?v=7jvxbSA5mns"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=wKg71lcs5Nw", "to": "https://www.youtube.com/watch?v=ItoNVjSmkx0"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=wKg71lcs5Nw", "to": "https://www.youtube.com/watch?v=xEv2_YqDWyc"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=p84DkT_WcVI", "to": "https://www.youtube.com/watch?v=9Rp7Ddxzajs"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=xSS0cS1Jg-w", "to": "https://www.youtube.com/watch?v=K0quMymkFzI"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=xSS0cS1Jg-w", "to": "https://www.youtube.com/watch?v=CGdxQLIVt9M"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=g6VJUi6KuKY", "to": "https://www.youtube.com/watch?v=rSNQ4fXq75U"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=g6VJUi6KuKY", "to": "https://www.youtube.com/watch?v=HKMsG0Rueu0"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=JLT8sRrG0xw", "to": "https://www.youtube.com/watch?v=EJ1muHSpFss"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=JLT8sRrG0xw", "to": "https://www.youtube.com/watch?v=v2H1s9gj5DA"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=r6U6ghkO6gU", "to": "https://www.youtube.com/watch?v=sfvdDvZQA1M"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=FdpraUoJ1A0", "to": "https://www.youtube.com/watch?v=IO4-j7BC6dA"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=FdpraUoJ1A0", "to": "https://www.youtube.com/watch?v=ZqqGDt2KT8w"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=7jvxbSA5mns", "to": "https://www.youtube.com/watch?v=Ap8jTCMK3c4"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=xEv2_YqDWyc", "to": "https://www.youtube.com/watch?v=OBzfYLF4mI4"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=9Rp7Ddxzajs", "to": "https://www.youtube.com/watch?v=5oH9Nr3bKfw"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=9Rp7Ddxzajs", "to": "https://www.youtube.com/watch?v=5JMpuh9BR6U"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=K0quMymkFzI", "to": "https://www.youtube.com/watch?v=V_jQ81v_xf8"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=CGdxQLIVt9M", "to": "https://www.youtube.com/watch?v=NfOg7uNLolA"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=CGdxQLIVt9M", "to": "https://www.youtube.com/watch?v=HagoDidoFMw"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=rSNQ4fXq75U", "to": "https://www.youtube.com/watch?v=uZX8trFzyl4"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=rSNQ4fXq75U", "to": "https://www.youtube.com/watch?v=5AMGLvROqsg"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=HKMsG0Rueu0", "to": "https://www.youtube.com/watch?v=Ii7o-ZSr35c"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=HKMsG0Rueu0", "to": "https://www.youtube.com/watch?v=yTD-QJfmEGc"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=EJ1muHSpFss", "to": "https://www.youtube.com/watch?v=fW2PPdn--ug"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=EJ1muHSpFss", "to": "https://www.youtube.com/watch?v=5spxCrKFofM"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=v2H1s9gj5DA", "to": "https://www.youtube.com/watch?v=Rvns5DaW-ug"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=v2H1s9gj5DA", "to": "https://www.youtube.com/watch?v=ZyYqyYAKGC0"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=sfvdDvZQA1M", "to": "https://www.youtube.com/watch?v=ECQs4_0m-4Y"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=sfvdDvZQA1M", "to": "https://www.youtube.com/watch?v=ANO4O5-3RI4"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=IO4-j7BC6dA", "to": "https://www.youtube.com/watch?v=rtgVcSu7IY8"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=ZqqGDt2KT8w", "to": "https://www.youtube.com/watch?v=FiZ1Gz7Uhgo"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=ZqqGDt2KT8w", "to": "https://www.youtube.com/watch?v=q6h2iU-5byk"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=Ap8jTCMK3c4", "to": "https://www.youtube.com/watch?v=4p68-lMrjYU"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=OBzfYLF4mI4", "to": "https://www.youtube.com/watch?v=yyvzht3NFpE"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=OBzfYLF4mI4", "to": "https://www.youtube.com/watch?v=I7Uk3xuc4z8"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5oH9Nr3bKfw", "to": "https://www.youtube.com/watch?v=PDh4gvb85ww"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5oH9Nr3bKfw", "to": "https://www.youtube.com/watch?v=WxDC1vRlA4A"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5JMpuh9BR6U", "to": "https://www.youtube.com/watch?v=QJemGYW6gvA"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5JMpuh9BR6U", "to": "https://www.youtube.com/watch?v=KW8vZY9pW7k"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=V_jQ81v_xf8", "to": "https://www.youtube.com/watch?v=UKbZ4r88z3Q"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=V_jQ81v_xf8", "to": "https://www.youtube.com/watch?v=1be17xK3O4c"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=NfOg7uNLolA", "to": "https://www.youtube.com/watch?v=5OIeIaAhQOg"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=NfOg7uNLolA", "to": "https://www.youtube.com/watch?v=GNJE__4ZtvE"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=HagoDidoFMw", "to": "https://www.youtube.com/watch?v=n0E-2juRHuI"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=HagoDidoFMw", "to": "https://www.youtube.com/watch?v=QzlcxmVBIFo"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=uZX8trFzyl4", "to": "https://www.youtube.com/watch?v=eDbBDeb_3g8"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=uZX8trFzyl4", "to": "https://www.youtube.com/watch?v=LtXp4RGuq_o"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5AMGLvROqsg", "to": "https://www.youtube.com/watch?v=2mWsO1CmJEc"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5AMGLvROqsg", "to": "https://www.youtube.com/watch?v=-uaMjhpi12M"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=yTD-QJfmEGc", "to": "https://www.youtube.com/watch?v=ErUZVWUP0c4"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=yTD-QJfmEGc", "to": "https://www.youtube.com/watch?v=C6hI2WB3wH8"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=fW2PPdn--ug", "to": "https://www.youtube.com/watch?v=lCKvrGr0UxY"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=fW2PPdn--ug", "to": "https://www.youtube.com/watch?v=v4dMkYdaipU"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5spxCrKFofM", "to": "https://www.youtube.com/watch?v=q35D-fy9XMw"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=5spxCrKFofM", "to": "https://www.youtube.com/watch?v=54BYy18SL7I"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=Rvns5DaW-ug", "to": "https://www.youtube.com/watch?v=60h6lpnSgck"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=Rvns5DaW-ug", "to": "https://www.youtube.com/watch?v=cTQ3Ko9ZKg8"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=ZyYqyYAKGC0", "to": "https://www.youtube.com/watch?v=qxjPjPzQ1iU"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=ECQs4_0m-4Y", "to": "https://www.youtube.com/watch?v=En6NRJpIVdE"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=ECQs4_0m-4Y", "to": "https://www.youtube.com/watch?v=uZuOUWGB9GM"}, {"color": "gray", "from": "https://www.youtube.com/watch?v=ANO4O5-3RI4", "to": "https://www.youtube.com/watch?v=Tf56Z_jqZLY"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -5000,
+            "springConstant": 0.01,
+            "springLength": 150
+        },
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.01,
+            "damping": 0.4,
+            "gravitationalConstant": -50,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>📋 Data Overview</h2>
+        <div class="data-table-container">
+            <table border="1" class="dataframe data-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>title</th>
+      <th>channel</th>
+      <th>views</th>
+      <th>url</th>
+      <th>depth</th>
+      <th>recommended_from</th>
+      <th>category_id</th>
+      <th>tags</th>
+      <th>thumbnail_url</th>
+      <th>view_count</th>
+      <th>category_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>🔴 LIVE: Predator Battles: Lions vs Leopards vs Hyenas | Savage Kingdom Livestream | Nat Geo Animals</td>
+      <td>Nat Geo Animals</td>
+      <td>1516227 views</td>
+      <td>https://www.youtube.com/watch?v=MiQe9ob9aDc</td>
+      <td>0</td>
+      <td>initial</td>
+      <td>24</td>
+      <td>Nat Geo,National Geographic,Nat Geo WILD,National Geographic WILD,science,discover,nature,documentary,wildlife,animals,photography,wild,national geographic animals,animal planet,lion,national geographic documentary,mantis shrimp punch,nat geo animals,wildlife heartlands,world's deadliest nat geo,nat geo documentaries,full episode,savage kingdom,wildlife 4k,animal documentary,big cats,animal attack,apex predators,lions,leopard,hyena,savage,savage king</td>
+      <td>https://i.ytimg.com/vi/MiQe9ob9aDc/maxresdefault_live.jpg</td>
+      <td>1516227.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>🔴 LIVE: Exploring America's National Parks | Earth Month LIVESTREAM | National Geographic</td>
+      <td>National Geographic</td>
+      <td>381413 views</td>
+      <td>https://www.youtube.com/watch?v=wVd836vHl6s</td>
+      <td>1</td>
+      <td>🔴 LIVE: Predator Battles: Lions vs Leopards vs Hyenas | Savage Kingdom Livestream | Nat Geo Animals</td>
+      <td>24</td>
+      <td>national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,photography,ancient civilization,history,America's National Parks,Livestream,Grand Canyon,Yosemite,Big Bend,National Parks,Badlands,Hawai'i Volcanoes,Hawaii,Grand Teton,Biscayne,Channel Islands,Lake Clark,Voyaguers,Minnesota,California,Miami,Pikas,Bears,Animals,Nature Video,Earth Month,Volcanoes,Oceans,Mountains,Deserts,nature documentary,wildlife 4k</td>
+      <td>https://i.ytimg.com/vi/wVd836vHl6s/maxresdefault_live.jpg</td>
+      <td>381413.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The Ocean Giants: The Largest Creatures Hidden Beneath the Sea</td>
+      <td>Top Unreal Journeys</td>
+      <td>24165 views</td>
+      <td>https://www.youtube.com/watch?v=2wCQvdJyvGg</td>
+      <td>1</td>
+      <td>🔴 LIVE: Predator Battles: Lions vs Leopards vs Hyenas | Savage Kingdom Livestream | Nat Geo Animals</td>
+      <td>27</td>
+      <td>ocean giants,ocean documentary,marine life documentary,deep ocean,deep sea creatures,blue whale documentary,whale documentary,ocean animals,largest animals on earth,underwater world,ocean mysteries,deep sea exploration,marine life,ocean facts,nature documentary,wildlife documentary,ocean ecosystem,climate change ocean,earth documentary,4k documentary,oil tanker,strait of hormuz,#iran,kharg island,oil</td>
+      <td>https://i.ytimg.com/vi/2wCQvdJyvGg/maxresdefault.jpg</td>
+      <td>24165.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>🔴 LIVE: The Incredible Wildlife of Hidden Forests | BBC Earth</td>
+      <td>BBC Earth</td>
+      <td>145370 views</td>
+      <td>https://www.youtube.com/watch?v=1LhlXiSc5NY</td>
+      <td>2</td>
+      <td>🔴 LIVE: Exploring America's National Parks | Earth Month LIVESTREAM | National Geographic</td>
+      <td>15</td>
+      <td>bbc documentary,bbc,bbcearth,bbc earth,nature documentary birds,forest sounds,forest animals for toddlers,forest animals video,forest animals documentary,frogs jumping,frogs mating,bears in forest,grizzly bear in forest,bears dancing,bears dancing in the forest,sloths moving,sloths falling out of trees,sloths moving slowly,david attenborough voice,orangutan,baby orangutan,birds in the forest,birds in forest sounds,birds in the wild,forest documentary</td>
+      <td>https://i.ytimg.com/vi/1LhlXiSc5NY/maxresdefault_live.jpg</td>
+      <td>145370.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>4K Video UHD - PARADISE ISLAND - Relaxing Music Along With Beautiful Nature Videos</td>
+      <td>Enjoy Relaxation</td>
+      <td>133107 views</td>
+      <td>https://www.youtube.com/watch?v=LeJ5ef6oQpI</td>
+      <td>2</td>
+      <td>🔴 LIVE: Exploring America's National Parks | Earth Month LIVESTREAM | National Geographic</td>
+      <td>10</td>
+      <td>4k video,relax,relaxing music,4k video ultra hd,relaxation film,4k,4k nature,calming music,4k ultra hd,sad music,drone film,relaxing piano music,city night 4k,instrumental music,scenic relaxation,4k video nature,relax 4k,amazing nature,emotional music,4k video 60fps,4k videos,drone view,soothing relaxation,sleep music,piano music,meditation music,paradise island 4k,paradise,paradise island,paradise 4k,piano relax,piano relaxing,calm</td>
+      <td>https://i.ytimg.com/vi/LeJ5ef6oQpI/maxresdefault_live.jpg</td>
+      <td>133107.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>From Here on InEveret AlmondFrom Here on In</td>
+      <td>Everet Almond - Topic</td>
+      <td>41531 views</td>
+      <td>https://www.youtube.com/watch?v=-M2lgCtxkiE</td>
+      <td>2</td>
+      <td>The Ocean Giants: The Largest Creatures Hidden Beneath the Sea</td>
+      <td>10</td>
+      <td>Everet Almond,From Here on In</td>
+      <td>https://i.ytimg.com/vi/-M2lgCtxkiE/maxresdefault.jpg</td>
+      <td>41531.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The Strait of Hormuz | The World’s Most Critical Energy Lifeline</td>
+      <td>Top Unreal Journeys</td>
+      <td>6427 views</td>
+      <td>https://www.youtube.com/watch?v=3aEEllYs9KQ</td>
+      <td>2</td>
+      <td>The Ocean Giants: The Largest Creatures Hidden Beneath the Sea</td>
+      <td>27</td>
+      <td>hormuz strait,oil shipping route,global oil trade,energy crisis documentary,middle east geopolitics,persian gulf oil,world oil supply,global economy oil,strategic chokepoint,iran us tensions,oil transport documentary,energy security,global trade routes,oil price impact,shipping lanes world,geopolitics documentary,4k documentary,kharg island,iran,strait of hormuz,oil,oil tanker,geopolitics,Documentary,maritime petroleum routes,Strait of Hormuz crisis</td>
+      <td>https://i.ytimg.com/vi/3aEEllYs9KQ/maxresdefault.jpg</td>
+      <td>6427.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Inside Africa’s Most Dangerous Jungle Where Survival Is Brutal</td>
+      <td>Wild Realms Studio</td>
+      <td>728275 views</td>
+      <td>https://www.youtube.com/watch?v=t3ljR4X05lM</td>
+      <td>3</td>
+      <td>🔴 LIVE: The Incredible Wildlife of Hidden Forests | BBC Earth</td>
+      <td>28</td>
+      <td>wildlife documentary,african wildlife,congo jungle,jungle animals,dangerous animals,wild animals,nature documentary,african jungle,predators,animal documentary,wildlife video,nature film,rainforest animals,animal planet style,extreme wildlife</td>
+      <td>https://i.ytimg.com/vi/t3ljR4X05lM/maxresdefault.jpg</td>
+      <td>728275.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Relaxing Music to Relieve Stress, Anxiety and Depression • Mind, Body 🐬 Soothing music for nerves</td>
+      <td>Soothing Soul</td>
+      <td>21544675 views</td>
+      <td>https://www.youtube.com/watch?v=wKg71lcs5Nw</td>
+      <td>3</td>
+      <td>🔴 LIVE: The Incredible Wildlife of Hidden Forests | BBC Earth</td>
+      <td>10</td>
+      <td>piano relaxing music,Sleep Music,Stress Relief,beautiful piano music,Healing Relaxtion,BGM,relaxing sleep music,relax,relaxation,meditation music,reep sleeping music,Relaxing Piano,study music,peaceful music,calm music,soothing music,calming music,meditation,piano music,background music,deep sleep instantly,rain,stress relief music,peaceful piano music,sound of rain,relaxing,piano,beautiful relaxing muisc,soothing relaxation,sleeping,soothing soul</td>
+      <td>https://i.ytimg.com/vi/wKg71lcs5Nw/maxresdefault_live.jpg</td>
+      <td>21544675.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The Best 4K Aquarium - Dive Into The Mesmerizing Underwater Realm, Sea Jellyfish, Coral Reefs . #7</td>
+      <td>AL Muzic Production</td>
+      <td>16131 views</td>
+      <td>https://www.youtube.com/watch?v=p84DkT_WcVI</td>
+      <td>3</td>
+      <td>4K Video UHD - PARADISE ISLAND - Relaxing Music Along With Beautiful Nature Videos</td>
+      <td>22</td>
+      <td>4kanimals,aquarium4k,4kaquarium</td>
+      <td>https://i.ytimg.com/vi/p84DkT_WcVI/hqdefault_live.jpg</td>
+      <td>16131.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Best of Gibran Alcocer (Beautiful Piano Mix)</td>
+      <td>Kurate Music</td>
+      <td>18536208 views</td>
+      <td>https://www.youtube.com/watch?v=xSS0cS1Jg-w</td>
+      <td>3</td>
+      <td>From Here on InEveret AlmondFrom Here on In</td>
+      <td>10</td>
+      <td>Kurate Music,Best of Gibran Alcocer (Beautiful Piano Mix),Best of Gibran Alcocer,Gibran Alcocer,Gibran Alcocer (Beautiful Piano Mix)</td>
+      <td>https://i.ytimg.com/vi/xSS0cS1Jg-w/maxresdefault.jpg</td>
+      <td>18536208.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Po's Funniest Training Scenes | Kung Fu Panda Movies | Family Flicks</td>
+      <td>Family Flicks</td>
+      <td>2423732 views</td>
+      <td>https://www.youtube.com/watch?v=g6VJUi6KuKY</td>
+      <td>3</td>
+      <td>From Here on InEveret AlmondFrom Here on In</td>
+      <td>1</td>
+      <td>family movies,nostalgic movies,movie clips,movie scenes,family movie scenes,family films,animated movies,animation,movies,comedy,comedy movies,adventure,kung fu panda,kung fu panda 2,kung fu panda 3,jack black,kung fu panda training,kung fu panda training scene,kung fu panda training montage,jack black kung fu panda,po kung fu panda,kung fu panda clips,kung fu panda scenes,dragon warrior,kung fu panda scene,kung fu panda 4,kung fu,po panda</td>
+      <td>https://i.ytimg.com/vi/g6VJUi6KuKY/maxresdefault.jpg</td>
+      <td>2423732.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>MonthaholicSchwartzyMonthaholic</td>
+      <td>Release - Topic</td>
+      <td>22328 views</td>
+      <td>https://www.youtube.com/watch?v=JLT8sRrG0xw</td>
+      <td>3</td>
+      <td>The Strait of Hormuz | The World’s Most Critical Energy Lifeline</td>
+      <td>10</td>
+      <td>Schwartzy,Monthaholic</td>
+      <td>https://i.ytimg.com/vi/JLT8sRrG0xw/maxresdefault.jpg</td>
+      <td>22328.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Antarctica Secrets | The Frozen Continent Hiding Earth’s Greatest Mysteries</td>
+      <td>Top Unreal Journeys</td>
+      <td>11172 views</td>
+      <td>https://www.youtube.com/watch?v=r6U6ghkO6gU</td>
+      <td>3</td>
+      <td>The Strait of Hormuz | The World’s Most Critical Energy Lifeline</td>
+      <td>27</td>
+      <td>antarctica documentary,antarctica secrets,frozen continent documentary,deep ice mysteries,antarctica 4k documentary,antarctica facts,vostok station,lake vostok,antarctica exploration,polar documentary,extreme cold earth,climate change antarctica,ice continent,antarctica wildlife,emperor penguin documentary,southern ocean documentary,earth mysteries,hidden world antarctica,antarctica science,strait of hormuz,oil,oil tanker,documentary 4k</td>
+      <td>https://i.ytimg.com/vi/r6U6ghkO6gU/maxresdefault.jpg</td>
+      <td>11172.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>These Sea Creatures Shouldn’t Be This Big</td>
+      <td>Wild Realms Studio</td>
+      <td>602472 views</td>
+      <td>https://www.youtube.com/watch?v=FdpraUoJ1A0</td>
+      <td>4</td>
+      <td>Inside Africa’s Most Dangerous Jungle Where Survival Is Brutal</td>
+      <td>28</td>
+      <td>ocean giants,giant ocean creatures,deep sea creatures,ocean creatures,marine life documentary,ocean animals,biggest creatures in the ocean,deep sea monsters,sea creatures documentary,mysterious ocean creatures,giant sea animals,wildlife documentary ocean,deep ocean life,incredible ocean creatures,ocean giants documentary,marine wildlife,largest ocean animals,creatures of the deep sea,underwater wildlife,ocean predators</td>
+      <td>https://i.ytimg.com/vi/FdpraUoJ1A0/maxresdefault.jpg</td>
+      <td>602472.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Deadly Venom: The Most Dangerous Creatures on Earth</td>
+      <td>Wild Realms Studio</td>
+      <td>231434 views</td>
+      <td>https://www.youtube.com/watch?v=7jvxbSA5mns</td>
+      <td>4</td>
+      <td>Inside Africa’s Most Dangerous Jungle Where Survival Is Brutal</td>
+      <td>28</td>
+      <td>venomous animals,deadly animals,most venomous animals,dangerous animals,deadly creatures,venomous creatures,wildlife documentary,nature documentary,dangerous creatures,most dangerous animals,toxic animals,animal documentary,wildlife facts,animals with venom,creatures of nature</td>
+      <td>https://i.ytimg.com/vi/7jvxbSA5mns/maxresdefault.jpg</td>
+      <td>231434.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>🌿 4K Animal Kingdom 🌍 Tranquil Wildlife Exploration with Calming Music</td>
+      <td>Rhythm Emotion</td>
+      <td>3012976 views</td>
+      <td>https://www.youtube.com/watch?v=ItoNVjSmkx0</td>
+      <td>4</td>
+      <td>Relaxing Music to Relieve Stress, Anxiety and Depression • Mind, Body 🐬 Soothing music for nerves</td>
+      <td>10</td>
+      <td>Animals 4k,Jungle,calming music,nature film,4k video,relaxing video,nature sounds,animal world,piano,relaxing music,natural sound,relax 4k,animals 4k video,soothing relaxation,piano relax animal 4k,wildlife movie,wildlife 4k video,wildlife 4k video ultra hd,Rhythm Emotion,4k ultra hd,piano music relax,animal world 4k,wildlife 4k,wildlife,relaxation movie,calm music,color animals,african wildlife 4k,4k</td>
+      <td>https://i.ytimg.com/vi/ItoNVjSmkx0/maxresdefault_live.jpg</td>
+      <td>3012976.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Healing of the Mind 🌿 Bamboo Water Sounds &amp; Relaxing Music, Anxiety Relief</td>
+      <td>Positive Healing Music</td>
+      <td>365843 views</td>
+      <td>https://www.youtube.com/watch?v=xEv2_YqDWyc</td>
+      <td>4</td>
+      <td>Relaxing Music to Relieve Stress, Anxiety and Depression • Mind, Body 🐬 Soothing music for nerves</td>
+      <td>10</td>
+      <td>relaxing music,meditation music,calming music,healing music,healing meditation,music relax,peaceful music,calm music,relaxing piano music,yoga music,spa music,music for meditation,bamboo water fountain,water sounds,music for yoga,meditation music relax mind body,sleep meditation,meditation for anxiety,stress relief music,relaxing music sleep,massage music,nature sounds relaxing music,sleep music,calm your mind,soothing relaxation,relax music</td>
+      <td>https://i.ytimg.com/vi/xEv2_YqDWyc/maxresdefault_live.jpg</td>
+      <td>365843.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Amazon’s Hidden Beauties, Tiny Marvels of Nature – Unveiling the Most Beautiful Small Birds on Earth</td>
+      <td>Gentle Breeze</td>
+      <td>530774 views</td>
+      <td>https://www.youtube.com/watch?v=9Rp7Ddxzajs</td>
+      <td>4</td>
+      <td>The Best 4K Aquarium - Dive Into The Mesmerizing Underwater Realm, Sea Jellyfish, Coral Reefs . #7</td>
+      <td>10</td>
+      <td>Amazon birds,small birds,tiny marvels of nature,birdwatching,nature’s hidden beauties,Amazon rainforest birds,wildlife documentary,bird lovers,hummingbirds,finches,bird species,wildlife in nature,birds of nature,Amazon wildlife,bird species revealed,bird behavior,wildlife discovery,colorful birds,rare bird species,birdwatching paradise,beautiful bird species,Amazon wonders,wild birds in the Amazon,rare birds in the Amazon,Amazon wildlife video</td>
+      <td>https://i.ytimg.com/vi/9Rp7Ddxzajs/maxresdefault_live.jpg</td>
+      <td>530774.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>most beautiful piano pieces (mix)</td>
+      <td>Kurate Music</td>
+      <td>68811 views</td>
+      <td>https://www.youtube.com/watch?v=K0quMymkFzI</td>
+      <td>4</td>
+      <td>Best of Gibran Alcocer (Beautiful Piano Mix)</td>
+      <td>10</td>
+      <td>Kurate Music,Kurate,Music,piano music,beautiful piano,piano pieces,emotional piano,peaceful piano,cinematic piano,study piano,sleep piano,calm piano,relaxing music,study music,sleep music,piano playlist,piano compilation,relaxing playlist,piano background music,relaxing background music,Gibran Alcocer,Idea 10,Solas,Idea 7,Idea 9,Joelmusicbox,most beautiful piano pieces (mix),most beautiful piano pieces,piano mix</td>
+      <td>https://i.ytimg.com/vi/K0quMymkFzI/maxresdefault.jpg</td>
+      <td>68811.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 𝐟𝐨𝐫 𝐬𝐭𝐮𝐝𝐲𝐢𝐧𝐠 | 𝐜𝐚𝐥𝐦 𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 𝐭𝐨 𝐫𝐞𝐥𝐚𝐱 | 𝐆𝐢𝐛𝐫𝐚𝐧 𝐀𝐥𝐜𝐨𝐜𝐞𝐫 𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 🕯️</td>
+      <td>full of tension</td>
+      <td>6409361 views</td>
+      <td>https://www.youtube.com/watch?v=CGdxQLIVt9M</td>
+      <td>4</td>
+      <td>Best of Gibran Alcocer (Beautiful Piano Mix)</td>
+      <td>10</td>
+      <td>playlist,study,studying,song,songs,music,musics,relax,calm,Gibran Alcocer,piano</td>
+      <td>https://i.ytimg.com/vi/CGdxQLIVt9M/maxresdefault.jpg</td>
+      <td>6409361.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The Dragon Warriors Training! 👊 | Kung Fu Panda | Adventure &amp; Play</td>
+      <td>Mini Moments - Adventure &amp; Play</td>
+      <td>3339469 views</td>
+      <td>https://www.youtube.com/watch?v=rSNQ4fXq75U</td>
+      <td>4</td>
+      <td>Po's Funniest Training Scenes | Kung Fu Panda Movies | Family Flicks</td>
+      <td>1</td>
+      <td>mini moments,adventure,play,explore,outdoors,excitement,journey,fun,safari,discovery,thrill,quest,amusement,challenge,joy,expedition,laughter,risk,games,travel,spontaneity,sports,mystery,creativity,peacock,Kung Fu,Panda,Po,Tigress,Monkey,Viper,Mantis,Tai Lung,Master Shifu,Shifu,Red Panda,Dumplings,Dragon,Warrior</td>
+      <td>https://i.ytimg.com/vi/rSNQ4fXq75U/maxresdefault.jpg</td>
+      <td>3339469.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Po Meets His Long Lost Dad! 🐼 KUNG FU PANDA 3 | Animal Friends</td>
+      <td>Mini Moments - Animal Friends</td>
+      <td>2057939 views</td>
+      <td>https://www.youtube.com/watch?v=HKMsG0Rueu0</td>
+      <td>4</td>
+      <td>Po's Funniest Training Scenes | Kung Fu Panda Movies | Family Flicks</td>
+      <td>1</td>
+      <td>mini moments,animal friends,mini moments - animal friends,cartoons for kids,animal videos,animals for kids,children's education,farm animals,dinosaurs,fish videos,dogs and cats,learn with animals,learn about animals,sing a long,madagascar,land before time,curious george,secret life of pets,olivia the pig,animated cartoons,woody woodpecker,321 penguins,safari animals,zoo animals,kids movies</td>
+      <td>https://i.ytimg.com/vi/HKMsG0Rueu0/maxresdefault.jpg</td>
+      <td>2057939.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>EXTREMELY POWERFUL Weapons That Changed The War 💥 | Kurukshetra | Netflix India</td>
+      <td>Netflix India</td>
+      <td>454805 views</td>
+      <td>https://www.youtube.com/watch?v=EJ1muHSpFss</td>
+      <td>4</td>
+      <td>MonthaholicSchwartzyMonthaholic</td>
+      <td>24</td>
+      <td>Hiranyakashyap,Prahlad,bhajan,epic,holika story,krishan bhajan,krishna,kurukshetra,kurukshetra animated series download,kurukshetra movie,kurukshetra series,kurukshetra story,kurukshetra trailer,kurukshetra war,kurukshetra web series trailer,mahavatar narsimha,mahavatar narsimha iskcon,mahavatar narsimha movie,movie,mythological movie,mythology,netflix kurukshetra series,ramayana,shiva,songs,vishnu,vishnu aarti,war</td>
+      <td>https://i.ytimg.com/vi/EJ1muHSpFss/maxresdefault.jpg</td>
+      <td>454805.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Interstellar | Docking Scene (Matthew McConaughey, Matt Damon, Anne Hathaway) | Paramount Movies</td>
+      <td>Paramount Movies</td>
+      <td>6081505 views</td>
+      <td>https://www.youtube.com/watch?v=v2H1s9gj5DA</td>
+      <td>4</td>
+      <td>MonthaholicSchwartzyMonthaholic</td>
+      <td>24</td>
+      <td>Paramount Movies,Paramount Pictures,Paramount,Paramount Movies 2023,Paramount Movies Digital,Paramount Movies to Watch,Matthew McConaughey,Anne Hathaway,Jessica Chastain,Bill Irwin,Ellen Burstyn,Michael Caine,Timothee Chalamet,Interstellar,Interstellar Full Scene,Interstellar Scene,Christopher Nolan Movies,Timothee Chalamet Movies,Matthew McConaughey Interstellar,Timothee Chalamet Interstellar,Matthew McConaughey Movies</td>
+      <td>https://i.ytimg.com/vi/v2H1s9gj5DA/maxresdefault.jpg</td>
+      <td>6081505.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The Strait of Hormuz: The Most Important Oil Route in the World</td>
+      <td>Top Unreal Journeys</td>
+      <td>17971 views</td>
+      <td>https://www.youtube.com/watch?v=sfvdDvZQA1M</td>
+      <td>4</td>
+      <td>Antarctica Secrets | The Frozen Continent Hiding Earth’s Greatest Mysteries</td>
+      <td>27</td>
+      <td>hormuz strait,oil shipping route,global oil trade,energy crisis documentary,middle east geopolitics,persian gulf oil,world oil supply,global economy oil,strategic chokepoint,iran us tensions,oil transport documentary,energy security,global trade routes,oil price impact,shipping lanes world,geopolitics documentary,4k documentary,kharg island,iran,strait of hormuz,oil,oil tanker,geopolitics,Documentary,maritime petroleum routes,Strait of Hormuz crisis</td>
+      <td>https://i.ytimg.com/vi/sfvdDvZQA1M/maxresdefault.jpg</td>
+      <td>17971.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>No Warning. No Escape. The Most Feared Predators in the Wild</td>
+      <td>Wild Realms Studio</td>
+      <td>604325 views</td>
+      <td>https://www.youtube.com/watch?v=IO4-j7BC6dA</td>
+      <td>5</td>
+      <td>These Sea Creatures Shouldn’t Be This Big</td>
+      <td>27</td>
+      <td>wildlife documentary,apex predators,deadliest predators,extreme animal attacks,nature documentary full length,predator hunt,animal hunting scenes,survival in the wild,brutal wildlife moments,wild animals 4k,great white shark attack,venomous snakes documentary,african predators,ocean predators,jungle predators,animal behavior documentary,untamed wilderness,predator vs prey,savage nature,cinematic wildlife,nat geo wild,predators 2010,alien vs predator</td>
+      <td>https://i.ytimg.com/vi/IO4-j7BC6dA/maxresdefault.jpg</td>
+      <td>604325.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>These Creatures Have Ruled China’s Mountains for Thousands of Years</td>
+      <td>Wild Realms Studio</td>
+      <td>82937 views</td>
+      <td>https://www.youtube.com/watch?v=ZqqGDt2KT8w</td>
+      <td>5</td>
+      <td>These Sea Creatures Shouldn’t Be This Big</td>
+      <td>27</td>
+      <td>China Wildlife Documentary,Untamed China,Ancient Wilderness,Hidden Wildlife,Asian Wildlife,Nature Documentary 4K,Mountain Predators,Rare Animals of China,Wild Asia,Earth Documentary,Cinematic Wildlife,Remote Landscapes,Dangerous Animals,Wildlife Exploration,cctv,amazing china,china</td>
+      <td>https://i.ytimg.com/vi/ZqqGDt2KT8w/maxresdefault.jpg</td>
+      <td>82937.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Jungles: Survival of the Fittest (Full Episode) | Hostile Planet</td>
+      <td>National Geographic</td>
+      <td>11214547 views</td>
+      <td>https://www.youtube.com/watch?v=Ap8jTCMK3c4</td>
+      <td>5</td>
+      <td>Deadly Venom: The Most Dangerous Creatures on Earth</td>
+      <td>24</td>
+      <td>national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,perpetual planet nat geo,photography,full episode,Hostile Planet nat geo,Hostile Planet national geographic,Hostile Planet full episode,Hostile Planet Jungles,Survival of the Fittest,Jungles full episode,Hostile Planet,Jungles</td>
+      <td>https://i.ytimg.com/vi/Ap8jTCMK3c4/maxresdefault.jpg</td>
+      <td>11214547.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The Hidden Beauty of Wild Birds in Spring Wonderland 🌸✨ Nature’s Living Jewels in Stunning Detail</td>
+      <td>RainBird Melody</td>
+      <td>217080 views</td>
+      <td>https://www.youtube.com/watch?v=OBzfYLF4mI4</td>
+      <td>5</td>
+      <td>Healing of the Mind 🌿 Bamboo Water Sounds &amp; Relaxing Music, Anxiety Relief</td>
+      <td>10</td>
+      <td>Wild birds,spring wonderland,nature’s secrets,bird watching,wild birds in spring,spring wildlife,bird behavior,birds in nature,hidden wonders of nature,nature exploration,springtime birds,discover wild birds,bird migration,birds of the season,beautiful wild birds,bird watching adventure,nature wonders revealed,birdwatching wildlife,birds of spring,spring birds 4k,bird watching tips,bird songs,the hidden beauty of wild birds,birds,RainBird Melody</td>
+      <td>https://i.ytimg.com/vi/OBzfYLF4mI4/maxresdefault_live.jpg</td>
+      <td>217080.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Tom &amp; Jerry | A Bit of Fresh Air! | Classic Cartoon Compilation | @WB Kids</td>
+      <td>WB Kids</td>
+      <td>616767811 views</td>
+      <td>https://www.youtube.com/watch?v=5oH9Nr3bKfw</td>
+      <td>5</td>
+      <td>Amazon’s Hidden Beauties, Tiny Marvels of Nature – Unveiling the Most Beautiful Small Birds on Earth</td>
+      <td>1</td>
+      <td>Scooby-Doo!,Tom and Jerry,Looney Tunes,Bugs Bunny,Compilation,Cartoons,Classic Cartoons,Animation,full episodes,Scooby doo where are you,chuck jones,Mel Blanc,Spike the Dog,Daffy Duck,Porky Pig,Coyote &amp; Roadrunner,Cute,Cuties,Friends,Best Friends,Spring,New Season,Outside,Fun,tom and jerry cartoon,youtube kids,compilation videos,cute cats,cute animals,funny cats,funny memes,funny cat videos,funny videos,cute baby,summer activity,outside play</td>
+      <td>https://i.ytimg.com/vi/5oH9Nr3bKfw/maxresdefault.jpg</td>
+      <td>616767811.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Nature’s Tiny Marvels: The Most Colorful Small Birds and Their Enchanting Songs</td>
+      <td>Gentle Breeze</td>
+      <td>87800 views</td>
+      <td>https://www.youtube.com/watch?v=5JMpuh9BR6U</td>
+      <td>5</td>
+      <td>Amazon’s Hidden Beauties, Tiny Marvels of Nature – Unveiling the Most Beautiful Small Birds on Earth</td>
+      <td>10</td>
+      <td>Nature’s Tiny Marvels,Colorful Small Birds,Beautiful Birds,Enchanting Bird Songs,Tiny Marvels,Birds with Colorful Feathers,Bird Watching,Nature Wonders,Colorful Birds,Nature’s Marvels,Exotic Birds,Beautiful Birds With Songs,Small Birds With Colorful Feathers,Most Colorful Birds,Melodic Birds,Nature’s Tiny Birds,Enchanting Birds,Birds with Vibrant Colors,Nature’s Wildlife,Stunning Small Birds,Birds with Beautiful Colors,Birds in Nature,Amazing Birds</td>
+      <td>https://i.ytimg.com/vi/5JMpuh9BR6U/maxresdefault_live.jpg</td>
+      <td>87800.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Cosmic Piano Waltzes - 20 min Relaxing Piano (by James Malikey)</td>
+      <td>James Malikey</td>
+      <td>117622 views</td>
+      <td>https://www.youtube.com/watch?v=V_jQ81v_xf8</td>
+      <td>5</td>
+      <td>most beautiful piano pieces (mix)</td>
+      <td>10</td>
+      <td>NaN</td>
+      <td>https://i.ytimg.com/vi/V_jQ81v_xf8/maxresdefault.jpg</td>
+      <td>117622.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Idea 10 (Slowed &amp; Reverb)Gibran AlcocerIdea 10</td>
+      <td>Gibran Alcocer - Topic</td>
+      <td>12972099 views</td>
+      <td>https://www.youtube.com/watch?v=NfOg7uNLolA</td>
+      <td>5</td>
+      <td>𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 𝐟𝐨𝐫 𝐬𝐭𝐮𝐝𝐲𝐢𝐧𝐠 | 𝐜𝐚𝐥𝐦 𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 𝐭𝐨 𝐫𝐞𝐥𝐚𝐱 | 𝐆𝐢𝐛𝐫𝐚𝐧 𝐀𝐥𝐜𝐨𝐜𝐞𝐫 𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 🕯️</td>
+      <td>10</td>
+      <td>Gibran Alcocer,Idea 10</td>
+      <td>https://i.ytimg.com/vi/NfOg7uNLolA/maxresdefault.jpg</td>
+      <td>12972099.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Idea 1 Gibran AlcocerIdea 1</td>
+      <td>Gibran Alcocer - Topic</td>
+      <td>4784764 views</td>
+      <td>https://www.youtube.com/watch?v=HagoDidoFMw</td>
+      <td>5</td>
+      <td>𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 𝐟𝐨𝐫 𝐬𝐭𝐮𝐝𝐲𝐢𝐧𝐠 | 𝐜𝐚𝐥𝐦 𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 𝐭𝐨 𝐫𝐞𝐥𝐚𝐱 | 𝐆𝐢𝐛𝐫𝐚𝐧 𝐀𝐥𝐜𝐨𝐜𝐞𝐫 𝐩𝐥𝐚𝐲𝐥𝐢𝐬𝐭 🕯️</td>
+      <td>10</td>
+      <td>Gibran Alcocer,Idea 1</td>
+      <td>https://i.ytimg.com/vi/HagoDidoFMw/maxresdefault.jpg</td>
+      <td>4784764.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Po Becomes the Dragon Warrior!  🐼 | Kung Fu Panda | Extended Preview | Mini Moments</td>
+      <td>Mini Moments</td>
+      <td>552033 views</td>
+      <td>https://www.youtube.com/watch?v=uZX8trFzyl4</td>
+      <td>5</td>
+      <td>The Dragon Warriors Training! 👊 | Kung Fu Panda | Adventure &amp; Play</td>
+      <td>1</td>
+      <td>Animated Cartoons For Kids,casper classics,woody woodpecker,veggietales,he man,postman pat,cartoons for kids,cartoon,casper the friendly ghost,he man theme song,kids movies,videos for kids,cartoons,the land before time,land before time,raa raa the noisy lion,noddy toyland,animated cartoons,animated cartoons for children,father of the pride,cartoons for kids full episodes,silly songs with larry,postman pat full episodes,veggietales full episode</td>
+      <td>https://i.ytimg.com/vi/uZX8trFzyl4/maxresdefault.jpg</td>
+      <td>552033.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Learn English with Disney's COCO — Crossing the Flower Bridge</td>
+      <td>Learn English With TV Series</td>
+      <td>348805 views</td>
+      <td>https://www.youtube.com/watch?v=5AMGLvROqsg</td>
+      <td>5</td>
+      <td>The Dragon Warriors Training! 👊 | Kung Fu Panda | Adventure &amp; Play</td>
+      <td>27</td>
+      <td>learn english,learn english with tv series,english tv series,english series,english serials,learn english grammar,ingles series,learn english online,how to learn english,easy way to learn english,learn english with tv,reallifeglobal.com,coco,viva a vida,a vida é uma festa,viva la vida</td>
+      <td>https://i.ytimg.com/vi/5AMGLvROqsg/maxresdefault.jpg</td>
+      <td>348805.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The ULTIMATE Kung Fu Panda 2 Compilation! 🐼 | Kung Fu Panda 2  | Adventure &amp; Play</td>
+      <td>Mini Moments - Adventure &amp; Play</td>
+      <td>1728675 views</td>
+      <td>https://www.youtube.com/watch?v=Ii7o-ZSr35c</td>
+      <td>5</td>
+      <td>Po Meets His Long Lost Dad! 🐼 KUNG FU PANDA 3 | Animal Friends</td>
+      <td>1</td>
+      <td>mini moments,adventure,play,explore,outdoors,excitement,journey,fun,safari,discovery,thrill,quest,amusement,challenge,joy,expedition,laughter,risk,games,travel,spontaneity,sports,mystery,creativity,hiking,curious george,lego,roblox,peacock</td>
+      <td>https://i.ytimg.com/vi/Ii7o-ZSr35c/maxresdefault.jpg</td>
+      <td>1728675.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>🔴 Gecko's Garage Live Episodes 🔴</td>
+      <td>Go Gecko's Garage!</td>
+      <td>4822 views</td>
+      <td>https://www.youtube.com/watch?v=yTD-QJfmEGc</td>
+      <td>5</td>
+      <td>Po Meets His Long Lost Dad! 🐼 KUNG FU PANDA 3 | Animal Friends</td>
+      <td>24</td>
+      <td>baby videos,buster,cartoons for babies,cartoons for kids,go buster,little baby bus,nursery rhymes,nursery rhymes for kids,songs for babies,songs for kids,videos for babies</td>
+      <td>https://i.ytimg.com/vi/yTD-QJfmEGc/maxresdefault_live.jpg</td>
+      <td>4822.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>LIVE-Special from Belgium | 5-HOUR study with me in Gent 📚⛈️ rain sounds &amp; pomodoro timer 60 &amp; 10</td>
+      <td>Pascal Zoels</td>
+      <td>9002 views</td>
+      <td>https://www.youtube.com/watch?v=fW2PPdn--ug</td>
+      <td>5</td>
+      <td>EXTREMELY POWERFUL Weapons That Changed The War 💥 | Kurukshetra | Netflix India</td>
+      <td>27</td>
+      <td>NaN</td>
+      <td>https://i.ytimg.com/vi/fW2PPdn--ug/maxresdefault.jpg</td>
+      <td>9002.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>निशाना नहीं चूका… रिश्ता बीच में आ गया 🔥| Bajirao Mastani Best Dialogue | Ranveer Singh</td>
+      <td>Eros Universe Bollywood Stories</td>
+      <td>349996 views</td>
+      <td>https://www.youtube.com/watch?v=5spxCrKFofM</td>
+      <td>5</td>
+      <td>EXTREMELY POWERFUL Weapons That Changed The War 💥 | Kurukshetra | Netflix India</td>
+      <td>10</td>
+      <td>bajirao mastani best dialogues,nishana nahi chuka rishta beech mein aa gaya,ranveer singh dialogue bajirao mastani,deepika padukone bajirao mastani scene,priyanka chopra mastani movie scene,bollywood iconic dialogues,hindi movie best dialogues,epic bollywood scenes shorts,bajirao mastani viral clips,ranveer singh powerful scenes</td>
+      <td>https://i.ytimg.com/vi/5spxCrKFofM/maxresdefault.jpg</td>
+      <td>349996.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Interstellar | Murph Saves The World (Full Scene) | Paramount Movies</td>
+      <td>Paramount Movies</td>
+      <td>5321479 views</td>
+      <td>https://www.youtube.com/watch?v=Rvns5DaW-ug</td>
+      <td>5</td>
+      <td>Interstellar | Docking Scene (Matthew McConaughey, Matt Damon, Anne Hathaway) | Paramount Movies</td>
+      <td>24</td>
+      <td>Paramount Movies,Paramount Pictures,Paramount,Paramount Movies 2023,Paramount Movies Digital,Paramount Movies to Watch,Matthew McConaughey,Anne Hathaway,Jessica Chastain,Bill Irwin,Ellen Burstyn,Michael Caine,Timothee Chalamet,Interstellar,Interstellar Full Scene,Interstellar Scene,Christopher Nolan Movies,Timothee Chalamet Movies,Matthew McConaughey Interstellar,Timothee Chalamet Interstellar,Matthew McConaughey Movies</td>
+      <td>https://i.ytimg.com/vi/Rvns5DaW-ug/maxresdefault.jpg</td>
+      <td>5321479.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Time Is But a Stubborn Illusion - Sneak Peek | Genius</td>
+      <td>National Geographic</td>
+      <td>15883291 views</td>
+      <td>https://www.youtube.com/watch?v=ZyYqyYAKGC0</td>
+      <td>5</td>
+      <td>Interstellar | Docking Scene (Matthew McConaughey, Matt Damon, Anne Hathaway) | Paramount Movies</td>
+      <td>24</td>
+      <td>Genius,Einstein,Chapter One,albert einstein,Geoffrey Rush,Johnny Flynn,Ron Howard,physics,history,biography,science,drama,relativity,exclusive look,time,illusion,light,sun,student,trigonometry,Time Is But,a Stubborn Illusion,Genius sneak peek,sneak peek,national geographic,nat geo,natgeo,animals,wildlife,explore,discover,survival,nature,culture,documentary,PLivjPDlt6ApTD3g-2b8Qb-Q_8vD4VXPMV,PLivjPDlt6ApS5FeUq8c-I7WWPVx3W0blc,PLivjPDlt6ApRiBHpsyXWG22G8RPNZ6jlb</td>
+      <td>https://i.ytimg.com/vi/ZyYqyYAKGC0/maxresdefault.jpg</td>
+      <td>15883291.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Pacific Ocean: The Largest and Most Mysterious Waters on Earth</td>
+      <td>Top Unreal Journeys</td>
+      <td>267 views</td>
+      <td>https://www.youtube.com/watch?v=ECQs4_0m-4Y</td>
+      <td>5</td>
+      <td>The Strait of Hormuz: The Most Important Oil Route in the World</td>
+      <td>27</td>
+      <td>strait of hormuz,oil,oil tanker,pacific ocean,pacific ocean documentary,ocean documentary,deep ocean,deep sea,ocean mysteries,nature documentary,earth documentary,ocean facts,deep sea creatures,mariana trench,ring of fire,ocean exploration,underwater world,ocean science,climate change ocean,ocean storms,tsunami,marine life,4k documentary,iran,kharg island</td>
+      <td>https://i.ytimg.com/vi/ECQs4_0m-4Y/maxresdefault.jpg</td>
+      <td>267.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Bermuda Triangle | What Are Scientists Discovering There?</td>
+      <td>Top Unreal Journeys</td>
+      <td>127 views</td>
+      <td>https://www.youtube.com/watch?v=ANO4O5-3RI4</td>
+      <td>5</td>
+      <td>The Strait of Hormuz: The Most Important Oil Route in the World</td>
+      <td>27</td>
+      <td>bermuda triangle,bermuda triangle documentary,bermuda triangle mystery,ocean mystery,deep ocean,deep sea mystery,unexplained mysteries,missing planes,lost ships,atlantic ocean,ocean documentary,mystery documentary,unsolved mysteries,deep sea,ocean facts,strange phenomena,mysterious places,earth mysteries,ocean exploration,4k documentary</td>
+      <td>https://i.ytimg.com/vi/ANO4O5-3RI4/maxresdefault.jpg</td>
+      <td>127.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Instrumental Worship Guitar : Best Worship Song | Peaceful, Relaxing Instrumental Hymns on Guitar</td>
+      <td>Sacred Guitar</td>
+      <td>61656 views</td>
+      <td>https://www.youtube.com/watch?v=rtgVcSu7IY8</td>
+      <td>6</td>
+      <td>No Warning. No Escape. The Most Feared Predators in the Wild</td>
+      <td>22</td>
+      <td>guitar worship instrumental,worship instrumental,worship guitar,worship guitar instrumental 2026,instrumental worship,worship music instrumental,worship music,3 hours worship guitar,Instrumental Worship Guitar,Worship Guitar Music,Studying Music,Stress Relief Music,Relaxing Guitar Music,Calm Guitar,Peaceful Guitar Music,Instrumental Prayer Music,Calm Study Music,Healing Guitar Music,Relaxing Guitar for Studying,Soothing Guitar for Stress Relief</td>
+      <td>https://i.ytimg.com/vi/rtgVcSu7IY8/maxresdefault_live.jpg</td>
+      <td>61656.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Indochina’s Wild Heart – Life in the Realm of the Monsoon | Free Documentary Nature</td>
+      <td>Free Documentary - Nature</td>
+      <td>291081 views</td>
+      <td>https://www.youtube.com/watch?v=FiZ1Gz7Uhgo</td>
+      <td>6</td>
+      <td>These Creatures Have Ruled China’s Mountains for Thousands of Years</td>
+      <td>27</td>
+      <td>Free Documentary,Documentaries,Full documentary,HD documentary,documentary - topic,documentary (tv genre),nature documentary</td>
+      <td>https://i.ytimg.com/vi/FiZ1Gz7Uhgo/maxresdefault.jpg</td>
+      <td>291081.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Good Morning America Full Broadcast - Monday, April 13, 2026</td>
+      <td>ABC News</td>
+      <td>93570 views</td>
+      <td>https://www.youtube.com/watch?v=q6h2iU-5byk</td>
+      <td>6</td>
+      <td>These Creatures Have Ruled China’s Mountains for Thousands of Years</td>
+      <td>25</td>
+      <td>News,p_cmsid=2494279,p_vid=news-132003408,Sarah Chalke,Scrubs,Jennie Garth,90210,Jared Isaacman,Artemis II,NASA,Donald Trump,Pope Leo,Iran,britney Spears,Strait of Hormuz,Eric Swalwell,Rory Mcllroy,Masters,golf,WNBA Draft,Lauren Betts,Kiki Rice,Gabriela Jaquez,abc news,gma,Good Morning America,ABc</td>
+      <td>https://i.ytimg.com/vi/q6h2iU-5byk/maxresdefault.jpg</td>
+      <td>93570.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Surviving the Grasslands (Full Episode) | Hostile Planet</td>
+      <td>National Geographic</td>
+      <td>4958816 views</td>
+      <td>https://www.youtube.com/watch?v=4p68-lMrjYU</td>
+      <td>6</td>
+      <td>Jungles: Survival of the Fittest (Full Episode) | Hostile Planet</td>
+      <td>24</td>
+      <td>national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,perpetual planet nat geo,photography,Hostile Planet,Earth's Poles,Survivalists,Adapting to Hostile Environments,The poles,homes,ultimate survivalists,Full Episode,National Geographic,Grasslands,animal kingdom,they battle volatile environments,Surving Grasslands Hostile Planet,Hostile Planet Grasslands,Hostile Planet Grasslands Full Episode,Grassland</td>
+      <td>https://i.ytimg.com/vi/4p68-lMrjYU/maxresdefault.jpg</td>
+      <td>4958816.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>🔴 24/7 Nature Documentaries  🔴 | Incredible Animals from the Wild | STREAM  @UltimateNatureDocs</td>
+      <td>Ultimate Nature Documentaries</td>
+      <td>8890 views</td>
+      <td>https://www.youtube.com/watch?v=yyvzht3NFpE</td>
+      <td>6</td>
+      <td>The Hidden Beauty of Wild Birds in Spring Wonderland 🌸✨ Nature’s Living Jewels in Stunning Detail</td>
+      <td>24</td>
+      <td>ultimate nature,ultimate nature documentaries,nature documentary,wild documentary,free documentary,free nature documentary,full documentary,full feature documentaries,free animal documentaries,animal doc,animal nature series,wild animals,wild animal documentary,planet earth documentary,educational,educational documentaries,nature education,24/7 stream,looped stream,looped nature videos,nature stream,nature documentaries,nature videos,stream,live,wild</td>
+      <td>https://i.ytimg.com/vi/yyvzht3NFpE/maxresdefault_live.jpg</td>
+      <td>8890.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>🌊 Deep Sea Wonders: Colorful Ocean Life &amp; Relaxing Music (24/7 Live)</td>
+      <td>Restful Nature Hub</td>
+      <td>224 views</td>
+      <td>https://www.youtube.com/watch?v=I7Uk3xuc4z8</td>
+      <td>6</td>
+      <td>The Hidden Beauty of Wild Birds in Spring Wonderland 🌸✨ Nature’s Living Jewels in Stunning Detail</td>
+      <td>10</td>
+      <td>Deep sea ocean life,colorful fishes,relaxing music,underwater live stream,4k ocean footage,marine biology,coral reef live,sleep music,study music,ambient ocean sounds,sea creatures,exotic fish,virtual aquarium,stress relief,nature documentary style,deep blue sea,peaceful music,meditation background.</td>
+      <td>https://i.ytimg.com/vi/I7Uk3xuc4z8/maxresdefault_live.jpg</td>
+      <td>224.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Tom &amp; Jerry | Rivalry of the Century | Classic Cartoon Compilation | WB Kids</td>
+      <td>WB Kids</td>
+      <td>13876120 views</td>
+      <td>https://www.youtube.com/watch?v=PDh4gvb85ww</td>
+      <td>6</td>
+      <td>Tom &amp; Jerry | A Bit of Fresh Air! | Classic Cartoon Compilation | @WB Kids</td>
+      <td>1</td>
+      <td>Scooby-Doo!,Tom and Jerry,Looney Tunes,Bugs Bunny,Compilation,Cartoons,Classic Cartoons,Animation,full episodes,Scooby doo where are you,chuck jones,Mel Blanc,Spike the Dog,Daffy Duck,Porky Pig,Coyote &amp; Roadrunner,TJ,CLASSIC</td>
+      <td>https://i.ytimg.com/vi/PDh4gvb85ww/maxresdefault.jpg</td>
+      <td>13876120.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Tom &amp; Jerry in italiano | In Vena Di Amare | WB Kids</td>
+      <td>WB Kids Italiano</td>
+      <td>53884408 views</td>
+      <td>https://www.youtube.com/watch?v=WxDC1vRlA4A</td>
+      <td>6</td>
+      <td>Tom &amp; Jerry | A Bit of Fresh Air! | Classic Cartoon Compilation | @WB Kids</td>
+      <td>1</td>
+      <td>Bambini,cartone animato,classico dei cartoni animati,Looney Tunes,video di gatti,gatto e topo,animali,commedia,tom &amp; jerry,tom and jerry,scooby doo,TJIT</td>
+      <td>https://i.ytimg.com/vi/WxDC1vRlA4A/maxresdefault.jpg</td>
+      <td>53884408.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Open Window by the Emerald Lake 🍃 Birdsong and Water Ambience for Calm and Focus</td>
+      <td>Spring Backyard</td>
+      <td>1674 views</td>
+      <td>https://www.youtube.com/watch?v=QJemGYW6gvA</td>
+      <td>6</td>
+      <td>Nature’s Tiny Marvels: The Most Colorful Small Birds and Their Enchanting Songs</td>
+      <td>10</td>
+      <td>spring ambience asmr,spring ambience,nature sounds,ambience,asmr ambience,cozy ambience,spring,relaxing sounds,sleep sounds,ambient,soundscape,spring ambiance atmosphere,spring vibes,garden ambience,study sounds,relaxation sounds,relaxing ambience,spring morning,outdoor coffee shop ambience,spring coffee shop ambience,nature ambience,window ambience,nature asmr,bird sounds,asmr relax,spring window,spring sounds</td>
+      <td>https://i.ytimg.com/vi/QJemGYW6gvA/maxresdefault.jpg</td>
+      <td>1674.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Alaska’s Untamed Beauty 4K: Untouched Wilderness &amp; Incredible Wildlife</td>
+      <td>4k Scenic Nature Film</td>
+      <td>2143141 views</td>
+      <td>https://www.youtube.com/watch?v=KW8vZY9pW7k</td>
+      <td>6</td>
+      <td>Nature’s Tiny Marvels: The Most Colorful Small Birds and Their Enchanting Songs</td>
+      <td>15</td>
+      <td>Alaska 4K,Wild Alaska,Nature Relaxation,Wildlife 4K,Wilderness,Relaxing Music,Nature Sounds,Glaciers,Stress Relief,Alaska Nature,Mountains 4K,Forest 4K,Wildlife Documentary,Nature Documentary,Arctic Wildlife,Untouched Wilderness,Nature Film,driving to alaska,yukon,alaska cruise,salmon,alaska travel,alaska nature documentary,alaska life,polar bear,nature film,wildlife,beauty,alaska,gulf of alaska,alaska wildlife,wilderness,hiking,travel alaska</td>
+      <td>https://i.ytimg.com/vi/KW8vZY9pW7k/maxresdefault.jpg</td>
+      <td>2143141.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The quiet beauty of everyday life | Piano Playlist</td>
+      <td>James Quinn</td>
+      <td>4231464 views</td>
+      <td>https://www.youtube.com/watch?v=UKbZ4r88z3Q</td>
+      <td>6</td>
+      <td>Cosmic Piano Waltzes - 20 min Relaxing Piano (by James Malikey)</td>
+      <td>10</td>
+      <td>piano,piano music,calm music,music for studying,study playlist,instrumental,instrumental music,calm piano,peaceful piano,piano playlist,quiet life,romanticise life,romanticize life,romanticize life playlist,slow living,slow living playlist,little life playlist</td>
+      <td>https://i.ytimg.com/vi/UKbZ4r88z3Q/maxresdefault.jpg</td>
+      <td>4231464.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>ETHEREAL SILVER - James Malikey | Piano Tutorial</td>
+      <td>CHRIS MUHAMA</td>
+      <td>1389 views</td>
+      <td>https://www.youtube.com/watch?v=1be17xK3O4c</td>
+      <td>6</td>
+      <td>Cosmic Piano Waltzes - 20 min Relaxing Piano (by James Malikey)</td>
+      <td>27</td>
+      <td>piano,piano music,piano cover,james malikey,ethereal silver,pianist,waltz,viral music,memories,trend</td>
+      <td>https://i.ytimg.com/vi/1be17xK3O4c/hqdefault.jpg</td>
+      <td>1389.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Idea 10Gibran AlcocerIdea 10</td>
+      <td>Kurate Music</td>
+      <td>20301260 views</td>
+      <td>https://www.youtube.com/watch?v=5OIeIaAhQOg</td>
+      <td>6</td>
+      <td>Idea 10 (Slowed &amp; Reverb)Gibran AlcocerIdea 10</td>
+      <td>10</td>
+      <td>Kurate Music,Gibran Alcocer - Idea 10,gibran alcocer idea 10,idea 10 gibran,Idea 10</td>
+      <td>https://i.ytimg.com/vi/5OIeIaAhQOg/maxresdefault.jpg</td>
+      <td>20301260.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Gibran Alcocer - All ideas playlist (1 Hour + Rain)</td>
+      <td>Dreamland</td>
+      <td>3149659 views</td>
+      <td>https://www.youtube.com/watch?v=GNJE__4ZtvE</td>
+      <td>6</td>
+      <td>Idea 10 (Slowed &amp; Reverb)Gibran AlcocerIdea 10</td>
+      <td>10</td>
+      <td>NaN</td>
+      <td>https://i.ytimg.com/vi/GNJE__4ZtvE/maxresdefault.jpg</td>
+      <td>3149659.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>background</td>
+      <td>Tony Anderson</td>
+      <td>600099 views</td>
+      <td>https://www.youtube.com/watch?v=n0E-2juRHuI</td>
+      <td>6</td>
+      <td>Idea 1 Gibran AlcocerIdea 1</td>
+      <td>10</td>
+      <td>ambient,ambientmusic</td>
+      <td>https://i.ytimg.com/vi/n0E-2juRHuI/maxresdefault.jpg</td>
+      <td>600099.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Gibran Alcocer - Idea 1</td>
+      <td>Kurate Music</td>
+      <td>3302238 views</td>
+      <td>https://www.youtube.com/watch?v=QzlcxmVBIFo</td>
+      <td>6</td>
+      <td>Idea 1 Gibran AlcocerIdea 1</td>
+      <td>10</td>
+      <td>Kurate Music,Gibran Alcocer - Idea 1,gibran idea 1,idea 1 gibran alcocer</td>
+      <td>https://i.ytimg.com/vi/QzlcxmVBIFo/maxresdefault.jpg</td>
+      <td>3302238.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>The Best of Kung Fu Panda 1-3 🐼 | Extended Preview | Mini Moments</td>
+      <td>Mini Moments</td>
+      <td>1912311 views</td>
+      <td>https://www.youtube.com/watch?v=eDbBDeb_3g8</td>
+      <td>6</td>
+      <td>Po Becomes the Dragon Warrior!  🐼 | Kung Fu Panda | Extended Preview | Mini Moments</td>
+      <td>1</td>
+      <td>Animated Cartoons For Kids,casper classics,woody woodpecker,veggietales,he man,postman pat,cartoons for kids,cartoon,casper the friendly ghost,he man theme song,kids movies,videos for kids,cartoons,the land before time,land before time,raa raa the noisy lion,noddy toyland,animated cartoons,animated cartoons for children,father of the pride,cartoons for kids full episodes,silly songs with larry,postman pat full episodes,veggietales full episode</td>
+      <td>https://i.ytimg.com/vi/eDbBDeb_3g8/maxresdefault.jpg</td>
+      <td>1912311.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>How Po Became the Dragon Warrior - Full Story 🐼 🐉 | Kung Fu Panda | Adventure &amp; Play</td>
+      <td>Mini Moments - Adventure &amp; Play</td>
+      <td>1919259 views</td>
+      <td>https://www.youtube.com/watch?v=LtXp4RGuq_o</td>
+      <td>6</td>
+      <td>Po Becomes the Dragon Warrior!  🐼 | Kung Fu Panda | Extended Preview | Mini Moments</td>
+      <td>1</td>
+      <td>mini moments,adventure,play,explore,outdoors,excitement,journey,fun,safari,discovery,thrill,quest,amusement,challenge,joy,expedition,laughter,risk,games,travel,spontaneity,sports,mystery,creativity,hiking,curious george,lego,roblox,peacock</td>
+      <td>https://i.ytimg.com/vi/LtXp4RGuq_o/maxresdefault.jpg</td>
+      <td>1919259.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Learn English with TANGLED — Rapunzel Heals Flynn</td>
+      <td>Learn English With TV Series</td>
+      <td>519558 views</td>
+      <td>https://www.youtube.com/watch?v=2mWsO1CmJEc</td>
+      <td>6</td>
+      <td>Learn English with Disney's COCO — Crossing the Flower Bridge</td>
+      <td>27</td>
+      <td>learn english,learn english with tv series,english tv series,english series,english serials,learn english grammar,ingles series,learn english online,how to learn english,easy way to learn english,learn english with tv,reallifeglobal.com,tangled,flynn,rider,rapunzel</td>
+      <td>https://i.ytimg.com/vi/2mWsO1CmJEc/maxresdefault.jpg</td>
+      <td>519558.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>History for Kids</td>
+      <td>Homeschool Pop</td>
+      <td>1246820 views</td>
+      <td>https://www.youtube.com/watch?v=-uaMjhpi12M</td>
+      <td>6</td>
+      <td>Learn English with Disney's COCO — Crossing the Flower Bridge</td>
+      <td>27</td>
+      <td>History for kids,history videos for kids,history</td>
+      <td>https://i.ytimg.com/vi/-uaMjhpi12M/maxresdefault.jpg</td>
+      <td>1246820.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Everything About Solar System | Solar System Explained | The Dr Binocs Show | Peekaboo Kidz</td>
+      <td>Peekaboo Kidz</td>
+      <td>8407027 views</td>
+      <td>https://www.youtube.com/watch?v=ErUZVWUP0c4</td>
+      <td>6</td>
+      <td>🔴 Gecko's Garage Live Episodes 🔴</td>
+      <td>27</td>
+      <td>Everything About Solar System,solar sytem,space video,planets in solar system,solar system video,space video for kids,solar system information,earth in solar system,solar system planets,sun formation,science,kids video,video for kids,learning video,elarning,online learning,peekaboo kids,dr binocs show,smart leaning,science video for kids,best kids videos,sun to earth distance,sun video for kids,space information for kids,jupiter in solar system,kids</td>
+      <td>https://i.ytimg.com/vi/ErUZVWUP0c4/maxresdefault.jpg</td>
+      <td>8407027.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>🔴 LIVE - BONNES VACANCES TOM ET JERRY  ! ⛷️🏔️ | COMPILATION ÉPISODES NON STOP 🔴 @CartoonitoFrance</td>
+      <td>Cartoonito France</td>
+      <td>2933677 views</td>
+      <td>https://www.youtube.com/watch?v=C6hI2WB3wH8</td>
+      <td>6</td>
+      <td>🔴 Gecko's Garage Live Episodes 🔴</td>
+      <td>1</td>
+      <td>cartoonito france,dessin animé,vidéo pour enfant,dessin animé complet,épisode complet,Dessins animés francais,live,live youtube,live dessin animé pour enfant,tom et jerry youtube live,youtube live tom et jerry,tom et jerry épisode complet,épisode entier tom et jerry,épisode tom et jerry,tom et jerry épisode,tom et jerry live,épisode dessin animé,dessin animé en live,regarder dessin animé,tom et jerry classique,tom et jerry show,tom et jerry nostalgie</td>
+      <td>https://i.ytimg.com/vi/C6hI2WB3wH8/maxresdefault_live.jpg</td>
+      <td>2933677.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>https://youtu.be/lCKvrGr0UxY</td>
+      <td>Pascal Zoels</td>
+      <td>27690 views</td>
+      <td>https://www.youtube.com/watch?v=lCKvrGr0UxY</td>
+      <td>6</td>
+      <td>LIVE-Special from Belgium | 5-HOUR study with me in Gent 📚⛈️ rain sounds &amp; pomodoro timer 60 &amp; 10</td>
+      <td>27</td>
+      <td>education,studywithme,study,pomodoro,studylifestyle,student,motivation,studytimer,studymotivation,studyalongside,pomodoro technique,pascal zoels,timer,rain sounds,study technique,60min,10min break,dreams,goals,determination,pascalzoels,ambience,relaxing,deepfocus,nature,12 hour studying,12 hour study with me,focus,hardwork,reading,readwithme,read with me,greatness,achieve your goals,hard work,hussle,dedication,chaseyourgoals,path,messi,Q&amp;A,cr7</td>
+      <td>https://i.ytimg.com/vi/lCKvrGr0UxY/maxresdefault.jpg</td>
+      <td>27690.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>https://youtu.be/v4dMkYdaipU</td>
+      <td>Pascal Zoels</td>
+      <td>37711 views</td>
+      <td>https://www.youtube.com/watch?v=v4dMkYdaipU</td>
+      <td>6</td>
+      <td>LIVE-Special from Belgium | 5-HOUR study with me in Gent 📚⛈️ rain sounds &amp; pomodoro timer 60 &amp; 10</td>
+      <td>27</td>
+      <td>education,studywithme,10 hours studying,study,pomodoro,studylifestyle,student,motivation,studytimer,studymotivation,studyalongside,pomodoro technique,pascal zoels,timer,rain sounds,questions,answers,Q&amp;A,Questions and answers,Motivation,srudymethod,happniess,new year,christmas</td>
+      <td>https://i.ytimg.com/vi/v4dMkYdaipU/maxresdefault.jpg</td>
+      <td>37711.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>मैं  Married हू ये गलत है 💔 | Rockstar Best Romantic Scene | Ranbir Kapoor | Nargis Fakhri</td>
+      <td>Eros Universe Bollywood Stories</td>
+      <td>514 views</td>
+      <td>https://www.youtube.com/watch?v=q35D-fy9XMw</td>
+      <td>6</td>
+      <td>निशाना नहीं चूका… रिश्ता बीच में आ गया 🔥| Bajirao Mastani Best Dialogue | Ranveer Singh</td>
+      <td>10</td>
+      <td>rockstar romantic scene ranbir kapoor,main married hoon yeh galat hai scene,rockstar best romantic scenes,ranbir kapoor emotional scene rockstar,nargis fakhri romantic scene,bollywood sad romantic scenes,rockstar movie best scenes,hindi romantic scenes youtube,heartbreak bollywood scenes,rockstar viral clips</td>
+      <td>https://i.ytimg.com/vi/q35D-fy9XMw/maxresdefault.jpg</td>
+      <td>514.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Desi Mike Tyson Moment 🔥 | Vineet Kumar Singh, Jimmy Shergill, Zoya Hussian | Mukkabaaz</td>
+      <td>Eros Universe Bollywood Stories</td>
+      <td>143 views</td>
+      <td>https://www.youtube.com/watch?v=54BYy18SL7I</td>
+      <td>6</td>
+      <td>निशाना नहीं चूका… रिश्ता बीच में आ गया 🔥| Bajirao Mastani Best Dialogue | Ranveer Singh</td>
+      <td>10</td>
+      <td>Mike Tyson hai hum Uttar Pradesh ke,Mukkabaaz dialogue,Vineet Kumar Singh powerful scene,Mukkabaaz best dialogues,UP power dialogue Bollywood,Vineet Kumar Singh performance,Bollywood intense scenes,Mukkabaaz movie clips,Anurag Kashyap cinema,Mukkabaaz Movie,Mukkabaaz movie scenes,Jimmy Shergill,Zoya Hussain,Vineet Kumar Singh Movie</td>
+      <td>https://i.ytimg.com/vi/54BYy18SL7I/maxresdefault.jpg</td>
+      <td>143.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Interstellar | “Tidal Wave" Full Scene (Anne Hathaway, Matthew McConaughey) | Paramount Movies</td>
+      <td>Paramount Movies</td>
+      <td>10727119 views</td>
+      <td>https://www.youtube.com/watch?v=60h6lpnSgck</td>
+      <td>6</td>
+      <td>Interstellar | Murph Saves The World (Full Scene) | Paramount Movies</td>
+      <td>24</td>
+      <td>Paramount Movies,Paramount Pictures,Paramount,Paramount Movies 2023,Paramount Movies Digital,Paramount Movies to Watch,Matthew McConaughey,Anne Hathaway,Jessica Chastain,Bill Irwin,Ellen Burstyn,Michael Caine,Timothee Chalamet,Interstellar,Interstellar Full Scene,Interstellar Scene,Christopher Nolan Movies,Timothee Chalamet Movies,Matthew McConaughey Interstellar,Timothee Chalamet Interstellar,Matthew McConaughey Movies</td>
+      <td>https://i.ytimg.com/vi/60h6lpnSgck/maxresdefault.jpg</td>
+      <td>10727119.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Our Planet | Frozen Worlds | FULL EPISODE | Netflix</td>
+      <td>Netflix</td>
+      <td>44659946 views</td>
+      <td>https://www.youtube.com/watch?v=cTQ3Ko9ZKg8</td>
+      <td>6</td>
+      <td>Interstellar | Murph Saves The World (Full Scene) | Paramount Movies</td>
+      <td>24</td>
+      <td>education,netflix education,documentary,climate change,polar bears,walruses,seals,penguins,natural beauty,ambitious documentary,netflix</td>
+      <td>https://i.ytimg.com/vi/cTQ3Ko9ZKg8/maxresdefault.jpg</td>
+      <td>44659946.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>War for the Planet of the Apes | Final Trailer | 20th Century FOX</td>
+      <td>Planet of the Apes</td>
+      <td>13813220 views</td>
+      <td>https://www.youtube.com/watch?v=qxjPjPzQ1iU</td>
+      <td>6</td>
+      <td>Time Is But a Stubborn Illusion - Sneak Peek | Genius</td>
+      <td>1</td>
+      <td>Trailer,Planet of the Apes,War for the Planet of the Apes Teaser,War for the Planet of the Apes,woody harrelson,Apes Movie,Andy Serkis,Steve Zahn,Judy Greer,Apes,Movie,FOX Movies,20th Century FOX,Caesar,James Franco,Film,Action,War for the Planet of the Apes NYCC,dawn of the planet of the apes,rise of the planet of the apes,POTA,Planet of the Apes Trailer,apes trailer,caesar planet of the apes,charlton heston,witness the end,final apes trailer</td>
+      <td>https://i.ytimg.com/vi/qxjPjPzQ1iU/maxresdefault.jpg</td>
+      <td>13813220.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Drake Passage: The Most Unforgiving Waters on Earth</td>
+      <td>Top Unreal Journeys</td>
+      <td>1929 views</td>
+      <td>https://www.youtube.com/watch?v=En6NRJpIVdE</td>
+      <td>6</td>
+      <td>Pacific Ocean: The Largest and Most Mysterious Waters on Earth</td>
+      <td>27</td>
+      <td>drake passage,drake passage documentary,drake passage waves,drake passage crossing,atlantic ocean documentary,atlantic ocean storms,southern ocean,cape horn,cape horn documentary,atlantic extreme weather,ocean storms,antarctica ocean,deep ocean documentary,ocean exploration,nature documentary,extreme ocean conditions,earth extreme,ocean mysteries,4k documentary</td>
+      <td>https://i.ytimg.com/vi/En6NRJpIVdE/maxresdefault.jpg</td>
+      <td>1929.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Beneath Mariana | The Deep Sea Mysteries No One Talks About</td>
+      <td>Top Unreal Journeys</td>
+      <td>6331 views</td>
+      <td>https://www.youtube.com/watch?v=uZuOUWGB9GM</td>
+      <td>6</td>
+      <td>Pacific Ocean: The Largest and Most Mysterious Waters on Earth</td>
+      <td>27</td>
+      <td>mariana trench,deep sea,ocean mysteries,deep ocean,underwater world,ocean documentary,deep sea creatures,abyss,sea monsters,ocean exploration,mariana trench documentary,deepest place on earth,unexplored ocean,strange sea creatures,ocean secrets,deep sea horror,unknown ocean,scariest ocean discoveries,nature documentary,science documentary,4k documentary</td>
+      <td>https://i.ytimg.com/vi/uZuOUWGB9GM/maxresdefault.jpg</td>
+      <td>6331.0</td>
+      <td>Unknown</td>
+    </tr>
+    <tr>
+      <td>Sleep Music No. 1Chris HaugenSleep Music No. 1</td>
+      <td>Chris Haugen - Topic</td>
+      <td>93164 views</td>
+      <td>https://www.youtube.com/watch?v=Tf56Z_jqZLY</td>
+      <td>6</td>
+      <td>Bermuda Triangle | What Are Scientists Discovering There?</td>
+      <td>10</td>
+      <td>Chris Haugen,Sleep Music No. 1</td>
+      <td>https://i.ytimg.com/vi/Tf56Z_jqZLY/maxresdefault.jpg</td>
+      <td>93164.0</td>
+      <td>Unknown</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Generated with YouTube Pathfinder</p>
+    </div>
+</body>
+</html>
