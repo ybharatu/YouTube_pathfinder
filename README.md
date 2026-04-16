@@ -107,19 +107,40 @@ The graph is bidirectional:
 ```
 youtube_pathfinder/
 ├── settings.py                 # Configuration
-├── youtube_search.py          # Main scraping script
-├── youtube_results.csv         # Output data
-├── youtube_node.py            # Node data structure
-├── youtube_graph.py            # Graph data structure
-├── youtube_create_graph.py     # Graph CLI tool
-├── youtube_visualize_map.py    # matplotlib visualization
+├── youtube_search.py          # Main scraping script (Selenium)
+├── youtube_search_api.py     # API-based search (DEPRECATED: related videos don't work)
+├── youtube_results.csv        # Output data
+├── youtube_results_enriched.csv # API-enriched output (initial only, no related)
+├── youtube_node.py           # Node data structure
+├── youtube_graph.py          # Graph data structure
+├── youtube_create_graph.py   # Graph CLI tool
+├── youtube_visualize_map.py  # matplotlib visualization
 ├── youtube_visualize_pyvis.py # PyVis visualization
-├── youtube_graph.pdf           # Generated PDF
-├── youtube_graph.html          # Generated HTML
-├── AGENTS.md                   # Agent instructions
-├── HELPME.md                   # User documentation
-└── README.md                   # This file
+├── youtube_dashboard.py      # Streamlit dashboard
+├── youtube_graph.pdf         # Generated PDF
+├── youtube_graph.html        # Generated HTML
+├── AGENTS.md                 # Agent instructions
+├── HELPME.md                 # User documentation
+└── README.md                 # This file
 ```
+
+## Important: API vs Selenium
+
+### YouTube Data API (youtube_search_api.py)
+- Uses official YouTube Data API v3
+- **Works**: Initial search, video details (views, category, tags)
+- **Does NOT work**: Related videos (endpoint deprecated Aug 2023)
+- Requires: `export YOUTUBE_API_KEY="your_key"`
+- Output: `youtube_results_enriched.csv` (depth 0 only)
+
+### Selenium (youtube_search.py)
+- Scrapes YouTube's website directly
+- **Works**: Everything (initial search, related videos, all metadata)
+- **Does NOT work**: None
+- Requires: Chrome browser + ChromeDriver
+- Output: `youtube_results.csv` (full depth levels)
+
+**Recommendation**: Use `youtube_search.py` (Selenium) for full functionality.
 
 ## Examples
 
