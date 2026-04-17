@@ -430,12 +430,21 @@ def main():
         st.subheader("Top Performing Videos by Depth")
         top_n = st.slider("Number of top videos per depth", 3, 10, 5)
         
+        def format_views(view_val):
+            if pd.isna(view_val) or view_val == '':
+                return 'N/A'
+            try:
+                view_str = str(view_val).lower().replace(',', '').replace(' views', '').replace('view', '').strip()
+                return f"{int(float(view_str)):,.0f}"
+            except:
+                return 'N/A'
+        
         for depth in sorted(filtered_df['depth'].unique()):
             depth_data = filtered_df[filtered_df['depth'] == depth].nlargest(top_n, 'view_count')
             if not depth_data.empty:
                 st.markdown(f"**Depth {int(depth)}** - Top {top_n} by views")
                 top_table = depth_data[['title', 'channel', 'views', 'category_name']].copy()
-                top_table['views'] = top_table['views'].apply(lambda x: f"{int(x):,}" if isinstance(x, (int, float)) else x)
+                top_table['views'] = top_table['views'].apply(format_views)
                 st.write(top_table.to_html(index=False, classes='table'), unsafe_allow_html=True)
     
     # === TAB 3: CATEGORY ANALYSIS ===

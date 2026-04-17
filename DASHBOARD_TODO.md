@@ -75,6 +75,31 @@
 - [ ] Sentiment analysis on titles
 - [ ] Keyword extraction
 
+### Advanced Analytics (Future)
+
+#### Category Deep Dive
+- [ ] Category transition matrix: How categories change parent→child
+- [ ] Category clustering in network (which categories group together)
+- [ ] Cross-category recommendation heatmap (which categories recommend which)
+
+#### Channel Analysis
+- [ ] Channel influence ranking (most recommended channels)
+- [ ] Channel "survival" rate (how far channels propagate through depths)
+
+#### View Cascades
+- [ ] View count cascading patterns (do high-view videos recommend higher/lower?)
+- [ ] Video "drop-off" analysis at each depth level
+
+#### Graph Metrics
+- [ ] Recommendation path length distribution
+- [ ] Longest recommendation chains
+- [ ] Connected component analysis
+
+#### Text/Tag Analysis
+- [ ] Tag co-occurrence matrix
+- [ ] Common themes extraction
+- [ ] Title similarity clustering
+
 ---
 
 ## Notes
