@@ -41,6 +41,41 @@ CATEGORY_NAMES = {
     '44': 'Trailers',
 }
 
+CATEGORY_COLORS = {
+    'Music': '#1DB954',
+    'Entertainment': '#FF6B6B',
+    'Science & Technology': '#4ECDC4',
+    'Education': '#45B7D1',
+    'Gaming': '#9B59B6',
+    'People & Blogs': '#F39C12',
+    'Comedy': '#E74C3C',
+    'Sports': '#2ECC71',
+    'News & Politics': '#34495E',
+    'Howto & Style': '#E91E63',
+    'Film & Animation': '#9C27B0',
+    'Autos & Vehicles': '#00BCD4',
+    'Pets & Animals': '#8BC34A',
+    'Travel & Events': '#FF9800',
+    'Short Movies': '#795548',
+    'Videoblogging': '#607D8B',
+    'Nonprofits & Activism': '#CDDC39',
+    'Movies': '#FF5722',
+    'Anime/Animation': '#673AB7',
+    'Action/Adventure': '#3F51B5',
+    'Classics': '#FFC107',
+    'Documentary': '#009688',
+    'Drama': '#FF0097',
+    'Family': '#00E676',
+    'Foreign': '#AA00FF',
+    'Horror': '#212121',
+    'Sci-Fi/Fantasy': '#00B8D4',
+    'Thriller': '#D50000',
+    'Shorts': '#76FF03',
+    'Shows': '#FFEA00',
+    'Trailers': '#FF9100',
+    'Unknown': '#95A5A6',
+}
+
 def load_category_names():
     """Load category names from file"""
     try:
@@ -76,8 +111,19 @@ def load_data(csv_file):
     
     df['view_count'] = df['views'].apply(parse_views)
     df['depth'] = pd.to_numeric(df['depth'], errors='coerce').fillna(0).astype(int)
-    df['category_id_str'] = df['category_id'].astype(str)
+    
+    # Map category ID to name (handle float/int, nan values)
+    def clean_category_id(cat_id):
+        if pd.isna(cat_id) or cat_id == '':
+            return 'Unknown'
+        try:
+            return str(int(float(cat_id)))
+        except:
+            return 'Unknown'
+    
+    df['category_id_str'] = df['category_id'].apply(clean_category_id)
     df['category_name'] = df['category_id_str'].map(CATEGORY_NAMES).fillna('Unknown')
+    df['category_color'] = df['category_name'].map(CATEGORY_COLORS).fillna('#95A5A6')
     
     return df
 
@@ -164,18 +210,25 @@ def create_dashboard(input_file, output_file='youtube_dashboard.html'):
     
     # === CATEGORY CHARTS ===
     
+    # Get unique categories and their colors
+    unique_categories = df['category_name'].unique()
+    category_color_map = {cat: CATEGORY_COLORS.get(cat, '#95A5A6') for cat in unique_categories}
+    
     # Pie chart - overall distribution
     category_counts = df['category_name'].value_counts().reset_index()
     category_counts.columns = ['Category', 'Count']
     fig_pie = px.pie(category_counts, values='Count', names='Category',
-                    title="Overall Category Distribution")
+                    title="Overall Category Distribution",
+                    color='Category',
+                    color_discrete_map=category_color_map)
     pie_chart = pio.to_html(fig_pie, full_html=False, include_plotlyjs='cdn')
     
     # Stacked bar - categories by depth
     category_by_depth = df.groupby(['depth', 'category_name']).size().reset_index(name='count')
     fig_stack = px.bar(category_by_depth, x='depth', y='count', color='category_name',
                       title="Categories at Each Depth",
-                      labels={'depth': 'Depth', 'count': 'Video Count'})
+                      labels={'depth': 'Depth', 'count': 'Video Count'},
+                      color_discrete_map=category_color_map)
     stack_chart = pio.to_html(fig_stack, full_html=False, include_plotlyjs='cdn')
     
     # === NETWORK ===

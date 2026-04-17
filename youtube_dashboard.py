@@ -115,6 +115,41 @@ CATEGORY_NAMES = {
     '44': 'Trailers',
 }
 
+CATEGORY_COLORS = {
+    'Music': '#1DB954',
+    'Entertainment': '#FF6B6B',
+    'Science & Technology': '#4ECDC4',
+    'Education': '#45B7D1',
+    'Gaming': '#9B59B6',
+    'People & Blogs': '#F39C12',
+    'Comedy': '#E74C3C',
+    'Sports': '#2ECC71',
+    'News & Politics': '#34495E',
+    'Howto & Style': '#E91E63',
+    'Film & Animation': '#9C27B0',
+    'Autos & Vehicles': '#00BCD4',
+    'Pets & Animals': '#8BC34A',
+    'Travel & Events': '#FF9800',
+    'Short Movies': '#795548',
+    'Videoblogging': '#607D8B',
+    'Nonprofits & Activism': '#CDDC39',
+    'Movies': '#FF5722',
+    'Anime/Animation': '#673AB7',
+    'Action/Adventure': '#3F51B5',
+    'Classics': '#FFC107',
+    'Documentary': '#009688',
+    'Drama': '#FF0097',
+    'Family': '#00E676',
+    'Foreign': '#AA00FF',
+    'Horror': '#212121',
+    'Sci-Fi/Fantasy': '#00B8D4',
+    'Thriller': '#D50000',
+    'Shorts': '#76FF03',
+    'Shows': '#FFEA00',
+    'Trailers': '#FF9100',
+    'Unknown': '#95A5A6',
+}
+
 def load_category_names():
     """Load category names from file"""
     try:
@@ -153,8 +188,17 @@ def load_data(csv_file):
     df['depth'] = pd.to_numeric(df['depth'], errors='coerce').fillna(0).astype(int)
     
     # Map category ID to name (convert to string for lookup)
-    df['category_id_str'] = df['category_id'].astype(str)
+    def clean_category_id(cat_id):
+        if pd.isna(cat_id) or cat_id == '':
+            return 'Unknown'
+        try:
+            return str(int(float(cat_id)))
+        except:
+            return 'Unknown'
+    
+    df['category_id_str'] = df['category_id'].apply(clean_category_id)
     df['category_name'] = df['category_id_str'].map(CATEGORY_NAMES).fillna('Unknown')
+    df['category_color'] = df['category_name'].map(CATEGORY_COLORS).fillna('#95A5A6')
     
     return df
 
@@ -305,10 +349,113 @@ def main():
         fig4.update_layout(title="Views Trend Across Depths", xaxis_title="Depth", yaxis_title="Views")
         fig4.update_yaxes(tickformat=",.0f")
         st.plotly_chart(fig4, use_container_width=True)
+        
+        st.subheader("View Count Growth/Decay Analysis")
+        avg_by_depth = filtered_df.groupby('depth')['view_count'].mean().reset_index()
+        if len(avg_by_depth) > 1:
+            avg_by_depth['pct_change'] = avg_by_depth['view_count'].pct_change() * 100
+            avg_by_depth['depth_str'] = avg_by_depth['depth'].astype(str)
+            
+            growth_data = avg_by_depth[avg_by_depth['pct_change'].notna()].copy()
+            growth_data['change_label'] = growth_data['pct_change'].apply(
+                lambda x: f"+{x:.1f}%" if x >= 0 else f"{x:.1f}%"
+            )
+            
+            fig_growth = go.Figure()
+            fig_growth.add_trace(go.Bar(
+                x=growth_data['depth_str'], 
+                y=growth_data['pct_change'],
+                text=growth_data['change_label'],
+                textposition='auto',
+                marker=dict(color=growth_data['pct_change'].apply(
+                    lambda x: '#2ecc71' if x >= 0 else '#e74c3c'
+                ))
+            ))
+            fig_growth.update_layout(
+                title="Average Views Change Between Depths (%)",
+                xaxis_title="Depth",
+                yaxis_title="Percent Change (%)"
+            )
+            st.plotly_chart(fig_growth, use_container_width=True)
+            
+            col_g1, col_g2 = st.columns(2)
+            with col_g1:
+                start_views = avg_by_depth.iloc[0]['view_count'] if len(avg_by_depth) > 0 else 0
+                end_views = avg_by_depth.iloc[-1]['view_count'] if len(avg_by_depth) > 0 else 0
+                overall_change = ((end_views - start_views) / start_views * 100) if start_views > 0 else 0
+                st.metric("Overall Change (Depth 0 → Max)", f"{overall_change:+.1f}%", 
+                         f"{end_views - start_views:,.0f} views")
+            with col_g2:
+                max_drop = growth_data['pct_change'].min() if len(growth_data) > 0 else 0
+                st.metric("Largest Drop", f"{max_drop:.1f}%")
+        
+        st.subheader("Views Distribution by Depth (Histogram)")
+        fig_hist = px.histogram(
+            filtered_df, 
+            x='view_count', 
+            color='depth',
+            title="Distribution of Views at Each Depth",
+            labels={'view_count': 'Views', 'depth': 'Depth'},
+            barmode='overlay',
+            opacity=0.7
+        )
+        fig_hist.update_xaxes(tickformat=",.0f")
+        st.plotly_chart(fig_hist, use_container_width=True)
+        
+        st.subheader("Scatter: Views vs Depth by Channel")
+        top_channels = filtered_df['channel'].value_counts().nlargest(12).index.tolist()
+        channel_filter = st.selectbox("Select channels to display:", 
+                                      ["All Channels"] + top_channels, 
+                                      index=0)
+        
+        if channel_filter != "All Channels":
+            scatter_df = filtered_df[filtered_df['channel'] == channel_filter]
+        else:
+            scatter_df = filtered_df[filtered_df['channel'].isin(top_channels)]
+        
+        fig_scatter = px.scatter(
+            scatter_df,
+            x='depth',
+            y='view_count',
+            color='channel',
+            size='view_count',
+            size_max=30,
+            title="Views vs Depth (colored by channel, size = view count)",
+            labels={'depth': 'Depth', 'view_count': 'Views', 'channel': 'Channel'},
+            hover_data=['title']
+        )
+        fig_scatter.update_yaxes(tickformat=",.0f")
+        st.plotly_chart(fig_scatter, use_container_width=True)
+        
+        st.subheader("Top Performing Videos by Depth")
+        top_n = st.slider("Number of top videos per depth", 3, 10, 5)
+        
+        for depth in sorted(filtered_df['depth'].unique()):
+            depth_data = filtered_df[filtered_df['depth'] == depth].nlargest(top_n, 'view_count')
+            if not depth_data.empty:
+                st.markdown(f"**Depth {int(depth)}** - Top {top_n} by views")
+                top_table = depth_data[['title', 'channel', 'views', 'category_name']].copy()
+                top_table['views'] = top_table['views'].apply(lambda x: f"{int(x):,}" if isinstance(x, (int, float)) else x)
+                st.write(top_table.to_html(index=False, classes='table'), unsafe_allow_html=True)
     
     # === TAB 3: CATEGORY ANALYSIS ===
     with tab3:
         st.header("Category Analysis by Depth")
+        
+        # Get unique categories and their colors
+        unique_categories = filtered_df['category_name'].unique()
+        category_color_map = {cat: CATEGORY_COLORS.get(cat, '#95A5A6') for cat in unique_categories}
+        
+        # Show category color legend
+        st.markdown("**Category Colors:**")
+        legend_cols = st.columns(min(4, len(unique_categories)))
+        for i, cat in enumerate(sorted(unique_categories)):
+            with legend_cols[i % 4]:
+                st.markdown(
+                    f'<span style="background-color:{category_color_map[cat]}; padding: 2px 8px; '
+                    f'border-radius: 4px; color: white; font-size: 12px;">{cat}</span>',
+                    unsafe_allow_html=True
+                )
         
         col1, col2 = st.columns(2)
         
@@ -317,7 +464,9 @@ def main():
             category_counts = filtered_df['category_name'].value_counts().reset_index()
             category_counts.columns = ['Category', 'Count']
             fig = px.pie(category_counts, values='Count', names='Category',
-                        title="Overall Category Distribution")
+                        title="Overall Category Distribution",
+                        color='Category',
+                        color_discrete_map=category_color_map)
             st.plotly_chart(fig, use_container_width=True)
         
         with col2:
@@ -325,7 +474,8 @@ def main():
             category_by_depth = filtered_df.groupby(['depth', 'category_name']).size().reset_index(name='count')
             fig2 = px.bar(category_by_depth, x='depth', y='count', color='category_name',
                         title="Categories at Each Depth",
-                        labels={'depth': 'Depth', 'count': 'Video Count'})
+                        labels={'depth': 'Depth', 'count': 'Video Count'},
+                        color_discrete_map=category_color_map)
             st.plotly_chart(fig2, use_container_width=True)
         
         st.subheader("Category by Depth (Detailed)")
@@ -340,7 +490,9 @@ def main():
                 st.write(cat_counts.head(5).to_html(index=False, classes='table'), unsafe_allow_html=True)
             with col_b:
                 fig = px.pie(cat_counts.head(5), values='Count', names='Category',
-                           title=f"Category breakdown at Depth {int(depth)}")
+                           title=f"Category breakdown at Depth {int(depth)}",
+                           color='Category',
+                           color_discrete_map=category_color_map)
                 st.plotly_chart(fig, use_container_width=True)
     
     # === TAB 4: DATA ===

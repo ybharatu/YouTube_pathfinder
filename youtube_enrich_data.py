@@ -75,6 +75,7 @@ def get_video_details(api_key, video_ids):
                         break
                 
                 video_details[video_id] = {
+                    'title': snippet.get('title', ''),
                     'channel': channel_name,
                     'views': view_count,
                     'category_id': category_id,
@@ -127,7 +128,9 @@ def enrich_csv(input_file, output_file=None):
         video_id = extract_video_id(row['url'])
         if video_id and video_id in video_details:
             details = video_details[video_id]
-            # Update channel and views from API (more accurate)
+            # Update title, channel and views from API (more accurate)
+            if details.get('title'):
+                row['title'] = details['title']
             if details.get('channel'):
                 row['channel'] = details['channel']
             if details.get('views'):

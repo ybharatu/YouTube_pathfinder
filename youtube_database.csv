@@ -1,168 +1,92 @@
-import csv
-import os
-import sys
-import requests
-import time
-import urllib.parse
-
-
-YOUTUBE_API_BASE_URL = "https://www.googleapis.com/youtube/v3"
-
-
-def get_api_key():
-    api_key = os.environ.get('YOUTUBE_API_KEY')
-    if not api_key:
-        print("Error: YOUTUBE_API_KEY environment variable not set")
-        print("  Set it with: export YOUTUBE_API_KEY='your_api_key'")
-        print("  Get API key from: https://console.cloud.google.com/apis/credentials")
-        sys.exit(1)
-    return api_key
-
-
-def extract_video_id(url):
-    """Extract video ID from YouTube URL"""
-    parsed = urllib.parse.urlparse(url)
-    query = urllib.parse.parse_qs(parsed.query)
-    return query.get('v', [None])[0]
-
-
-def get_video_details(api_key, video_ids):
-    """Fetch video details from YouTube Data API"""
-    if not video_ids:
-        return {}
-    
-    video_details = {}
-    batch_size = 50
-    
-    for i in range(0, len(video_ids), batch_size):
-        batch = video_ids[i:i + batch_size]
-        ids_string = ','.join(batch)
-        
-        url = f"{YOUTUBE_API_BASE_URL}/videos"
-        params = {
-            'part': 'snippet,statistics,contentDetails',
-            'id': ids_string,
-            'key': api_key
-        }
-        
-        try:
-            response = requests.get(url, params=params, timeout=10)
-            data = response.json()
-            
-            if 'error' in data:
-                print(f"  API Error: {data['error']['message']}")
-                break
-            
-            for item in data.get('items', []):
-                video_id = item['id']
-                snippet = item.get('snippet', {})
-                statistics = item.get('statistics', {})
-                
-                channel_name = snippet.get('channelTitle', '')
-                
-                view_count = statistics.get('viewCount', '')
-                
-                category_id = snippet.get('categoryId', '')
-                
-                tags = snippet.get('tags', [])
-                tags_str = ','.join(tags) if tags else ''
-                
-                thumbnails = snippet.get('thumbnails', {})
-                thumbnail_url = ''
-                for key in ['maxres', 'high', 'medium', 'default']:
-                    if key in thumbnails:
-                        thumbnail_url = thumbnails[key]['url']
-                        break
-                
-                video_details[video_id] = {
-                    'channel': channel_name,
-                    'views': view_count,
-                    'category_id': category_id,
-                    'tags': tags_str,
-                    'thumbnail_url': thumbnail_url
-                }
-            
-            if i + batch_size < len(video_ids):
-                time.sleep(0.1)
-                
-        except Exception as e:
-            print(f"  Error fetching batch: {e}")
-            break
-    
-    return video_details
-
-
-def enrich_csv(input_file, output_file=None):
-    if output_file is None:
-        output_file = input_file.replace('.csv', '_enriched.csv')
-    
-    api_key = get_api_key()
-    
-    print(f"Reading: {input_file}")
-    with open(input_file, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        rows = list(reader)
-    
-    print(f"Found {len(rows)} videos")
-    
-    video_ids = []
-    for row in rows:
-        video_id = extract_video_id(row['url'])
-        if video_id:
-            video_ids.append(video_id)
-    
-    unique_ids = list(set(video_ids))
-    print(f"Unique video IDs: {len(unique_ids)}")
-    
-    if not unique_ids:
-        print("No valid YouTube video URLs found")
-        return
-    
-    print("Fetching video details from YouTube API...")
-    video_details = get_video_details(api_key, unique_ids)
-    print(f"Retrieved details for {len(video_details)} videos")
-    
-    # Add new columns to each row
-    for row in rows:
-        video_id = extract_video_id(row['url'])
-        if video_id and video_id in video_details:
-            details = video_details[video_id]
-            # Update channel and views from API (more accurate)
-            if details.get('channel'):
-                row['channel'] = details['channel']
-            if details.get('views'):
-                row['views'] = details['views'] + ' views'
-            row['category_id'] = details.get('category_id', '')
-            row['tags'] = details.get('tags', '')
-            row['thumbnail_url'] = details.get('thumbnail_url', '')
-        else:
-            row['category_id'] = ''
-            row['tags'] = ''
-            row['thumbnail_url'] = ''
-    
-    # Write enriched CSV
-    fieldnames = ['title', 'channel', 'views', 'url', 'depth', 'recommended_from', 'category_id', 'tags', 'thumbnail_url']
-    
-    with open(output_file, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(rows)
-    
-    print(f"Saved enriched data to: {output_file}")
-
-
-def main():
-    input_file = 'youtube_results.csv'
-    
-    if len(sys.argv) > 1:
-        input_file = sys.argv[1]
-    
-    if len(sys.argv) > 2:
-        output_file = sys.argv[2]
-        enrich_csv(input_file, output_file)
-    else:
-        enrich_csv(input_file)
-
-
-if __name__ == '__main__':
-    main()
+title,channel,views,url,depth,recommended_from,category_id,tags,thumbnail_url
+The Weird Physics Surrounding Black Holes That Will Make You Question Your Existence,Astrum Extra,2067961 views,https://www.youtube.com/watch?v=RY4IDi8435U,0,initial,27,"Astrum,Astronomy,Science,Space,Stars,Mars,SolarSystem,Universe,Earth,Astrophysics,Asteroids,Cosmology,Space missions,Star clusters,black holes,general relativity,inside a black hole,travel inside a black hole,black holes explained,white hole,worm hole,universe,existence of wormhole,what happens if,what happens inside of a black hole,event horizon,solar system,outerspace,space,astrum space",https://i.ytimg.com/vi/RY4IDi8435U/maxresdefault.jpg
+Kurtuluş Kuş & Burak Bulut - Baba Yak (Berkan Ural Remix),Berkan Ural Music,460282 views,https://www.youtube.com/watch?v=05OFp7YFoxU,1,The Weird Physics Surrounding Black Holes That Will Make You Question Your Existence,10,,https://i.ytimg.com/vi/05OFp7YFoxU/maxresdefault.jpg
+Neutron Stars Are Weirder Than We Ever Imagined,Astrum Extra,925133 views,https://www.youtube.com/watch?v=33xCRo3UW9Q,1,The Weird Physics Surrounding Black Holes That Will Make You Question Your Existence,27,"Astrum,astrum space,astrumspace,astrum extra,astrumextra,space,compilation,astrum compilation,astronomy,astrophysics,science,physics,documentary,star,stars,galaxies,NASA,neutron star,neutron,neutron stars,telescope,shockwave,supernova,supernovae,pulsar,pulsars,magnetar,magnetars,gpm j1839–10,positron,signal,geminga,antimatter,anti matter,kilonova,kilonovae,Gravitational wave,gravitational waves,LIGO,NANO Grav,NANOgrav,big bang,blackhole,black hole,spacetime,gravity",https://i.ytimg.com/vi/33xCRo3UW9Q/maxresdefault.jpg
+Kurtuluş Kuş & Burak Bulut - Beni Bu Geceden Öldür (Berkan Ural Remix),Berkan Ural Music,15386 views,https://www.youtube.com/watch?v=CIO5RV9fXnw,2,LightsPatrick PatrikiosLights,10,,https://i.ytimg.com/vi/CIO5RV9fXnw/maxresdefault.jpg
+Kurtuluş Kuş & Burak Bulut - Sevmedim Deme,Mahzen Fabrick,301386872 views,https://www.youtube.com/watch?v=rbjAilk31Sg,2,LightsPatrick PatrikiosLights,10,"netd Müzik,Musik,musiqi,музика,muziek,musique,musiqaa,موسيقى,şarkılar,şarkı,müzik,Official,netd,Hit Şarkılar,izle,klip,Top 10,top 20,en hit,çok dinlenen,yeni şarkılar,en yeni şarkılar,2021 hit şarkılar,Turkish Music,turca musica,Türkçe Müzik,Kurtuluş Kuş & Burak Bulut - Sevmedim Deme,Kurtuluş Kuş,Burak Bulut,Sevmedim Deme",https://i.ytimg.com/vi/rbjAilk31Sg/maxresdefault.jpg
+Dreamer,DivKid - Topic,76668 views,https://www.youtube.com/watch?v=gSp5JNyKpxk,2,Neutron Stars Are Weirder Than We Ever Imagined,10,"DivKid,Dreamer",https://i.ytimg.com/vi/gSp5JNyKpxk/maxresdefault.jpg
+Our Planet | High Seas | FULL EPISODE | Netflix,Netflix,41780694 views,https://www.youtube.com/watch?v=9FqwhW0B3tY,2,Neutron Stars Are Weirder Than We Ever Imagined,24,"education,netflix education,documentary,creatures,creature,beautiful,ocean,netflix,natural beauty",https://i.ytimg.com/vi/9FqwhW0B3tY/maxresdefault.jpg
+Come With Us,Nat Keefe & Hot Buttered Rum - Topic,273111 views,https://www.youtube.com/watch?v=SQUdPSWHRTc,3,Kurtuluş Kuş & Burak Bulut - Beni Bu Geceden Öldür (Berkan Ural Remix),10,"Nat Keefe & Hot Buttered Rum,Come With Us",https://i.ytimg.com/vi/SQUdPSWHRTc/maxresdefault.jpg
+Black Holes Keep Getting Stranger,Astrum Extra,246863 views,https://www.youtube.com/watch?v=Dpv-1ybVTRs,3,Kurtuluş Kuş & Burak Bulut - Beni Bu Geceden Öldür (Berkan Ural Remix),27,"Astrum,astrum space,astrumspace,astrum extra,astrumextra,space,compilation,astronomy,astrophysics,science,physics,documentary,solar system,universe,star,stars,galaxy,galaxies,NASA,ESA,black hole,black,hole,holes,blackhole,blackholes,theoretical,event,horizon,singularity,inside,spacetime,relativity,general relativity,einstein,jwst,james,webb,telescope,quasar,supermassive,stellar,microscopic,tiny,eddington,limit,accretion,collision,merger,ligo,gravitational,wave,waves,gravity,virgo",https://i.ytimg.com/vi/Dpv-1ybVTRs/maxresdefault.jpg
+Sevmedim Deme,Kurtuluş Kuş - Topic,84632644 views,https://www.youtube.com/watch?v=SfAlJ9-PFPM,3,Kurtuluş Kuş & Burak Bulut - Sevmedim Deme,10,"Kurtuluş Kuş, Burak Bulut,Kurtuluş Kuş,Burak Bulut,Onur Aşar,Sevmedim Deme",https://i.ytimg.com/vi/SfAlJ9-PFPM/maxresdefault.jpg
+Saad Lamjarred - LM3ALLEM (Exclusive Music Video) |  (سعد لمجرد - لمعلم (فيديو كليب حصري,Saad Lamjarred | سعد لمجرد,1228916088 views,https://www.youtube.com/watch?v=_Fwf45pIAtM,3,Kurtuluş Kuş & Burak Bulut - Sevmedim Deme,10,"DJVAN,انت معلم مع الكلمات,saad lamjarred lm3allem,Egypt,سعد المجرد 2015,saad lamjarred 2015,saad,سعد المجرد,ENTY TOUR,اغنية انت معلم,nta m3alem,اغاني 2015,saad lamjarred lam3alem,انت معلم,lemen nechki hali,معلم,انته معلم,lm3allem,أنت معلم,سعد لمجرد لمعلم,lm3alem,المعلم,enta m3alem,Saad Lamjarred | سعد لمجرد,سعد لمجرد,lamjarred,2016,maroc 2015,لمعلم,UC9hJ,انتا معلم,m3alem,inta m3alem,المعلم سعد المجرد,lam3alem,saad lamjarred 2016,muallim,xyzfc",https://i.ytimg.com/vi/_Fwf45pIAtM/maxresdefault.jpg
+08 Digifunk - DivKid   ~ MIXED,Groovetron Music 🎵,9217 views,https://www.youtube.com/watch?v=olFcZ12HLOs,3,DreamerDivKidDreamer,10,"Relaxation music,Relax music,techno music,dence music,remix,LoudBass,funny,music no copyright,Music for inspiration,hologram,music,dence,cool sound,r&b,techno,trans,trach,mix,no copyright",https://i.ytimg.com/vi/olFcZ12HLOs/maxresdefault.jpg
+15 Minute Relaxing Meditation Music (Ambient Meditation Music) - SERATMOS,Seratmos,916 views,https://www.youtube.com/watch?v=Y6GihAf6Tsg,3,DreamerDivKidDreamer,10,"meditation music,ambient music,instrumental music,relaxing music,calming music,chillout music,atmospheric music,spa music,new age music,music for relaxation,yoga music,mindfulness music,peaceful music,meditation sounds,short meditation music,stress relief music,healing music,spiritual music,zen music,soundscape,background music,relaxing meditation music,15 minute meditation",https://i.ytimg.com/vi/Y6GihAf6Tsg/maxresdefault.jpg
+Our Planet | Coastal Seas | FULL EPISODE | Netflix,Netflix,42796574 views,https://www.youtube.com/watch?v=r9PeYPHdpNo,3,Our Planet | High Seas | FULL EPISODE | Netflix,24,"education,netflix education,documentary,climate change,natural beauty,ambitious documentary,netflixsharks,lowly urchins,coastal waters",https://i.ytimg.com/vi/r9PeYPHdpNo/maxresdefault.jpg
+Our Planet | Fresh Water | FULL EPISODE | Netflix,Netflix,26083235 views,https://www.youtube.com/watch?v=R2DU85qLfJQ,3,Our Planet | High Seas | FULL EPISODE | Netflix,24,"education,netflix education,documentary,our planet,baby animals,babies,baby,our planet Netflix,nature,planet earth,blue planet,earth,wild animals,environment,climate change,global warming,nat geo,national geographic,family,animals,elephant,tiger,gorilla,eagle,penguin,wildebeest,pelican,dogs,cute,cute animals,cute babies,water",https://i.ytimg.com/vi/R2DU85qLfJQ/maxresdefault.jpg
+Tony Anderson - Ember,Tony Anderson,600785 views,https://www.youtube.com/watch?v=n0E-2juRHuI,4,Come With UsNat Keefe & Hot Buttered RumCome With Us,10,"ambient,ambientmusic",https://i.ytimg.com/vi/n0E-2juRHuI/maxresdefault.jpg
+Dark Souls 2 OST - Majula + Ambience - 1 HOUR,AmeRain,809967 views,https://www.youtube.com/watch?v=5i_enopHsqg,4,Come With UsNat Keefe & Hot Buttered RumCome With Us,10,"dark souls 2 ost,dark souls 2 hub music,dark souls 2 majula,dark souls 2 majula extended,dark souls 2 ost majula,dark souls 2 majula hour loop,dark souls 2 majula + ambience,dark souls 2 majula and ambience,dark souls 2 majula ambience,dark souls 2 majula hour,dark souls 2 majula loop,dark souls majula,majula music,majula loop,majula ost one hour,dark souls majula loop,majula ost,majula extened,majula + ambience,majula and ambience,majula dark souls 2",https://i.ytimg.com/vi/5i_enopHsqg/maxresdefault.jpg
+Large Quasar Groups,SEA,1867542 views,https://www.youtube.com/watch?v=xMy2O1RVkMI,4,Black Holes Keep Getting Stranger,28,"Sea 1997,Conspiracy Cases,Sea1997,Sea,1997,Space,OOTW,Out of this world,astronomy,science,quasar,large quasar group,lqg,pp chain,roger clowes,clowes campusano lqg,u1.11,huge lqg,u1.27,black hole,SMBH,galaxy,quasar documentary,accretion disk,electromagnetic,light,radiation,cosmic structures,largest cosmic structures,quasar groups,homogeneity,cosmological principle,3c 273,markarian 231,sloan digital sky survey,blazar,radio,x-ray,gamma ray,space,universe",https://i.ytimg.com/vi/xMy2O1RVkMI/maxresdefault.jpg
+What's the Hottest Place In the Universe?,Astrum Extra,241469 views,https://www.youtube.com/watch?v=up_dMyZenRw,4,"Sevmedim DemeKurtuluş Kuş, Burak BulutSevmedim Deme",27,"Astrum,astrum space,astrumspace,astrum extra,astrumextra,space,compilation,astronomy,astrophysics,science,physics,documentary,solar system,sun,universe,planet,planets,star,stars,galaxy,galaxies,NASA,ESA,hottest,hot,heat,quasar,blackhole,black,hole,holes,supermassive,jet,jets,brightest,kilonova,neutron star,explosion,explode,supernova,nova,radiation,gamma,fusion,atmosphere,plasma,corona,Hydrogen,helium,stellar,Venus,magellan,mission,clouds,surface,probe,venera,Mercury,magnetic,orbit",https://i.ytimg.com/vi/up_dMyZenRw/maxresdefault.jpg
+Saad Lamjarred - GHALTANA (EXCLUSIVE Music Video) | (سعد لمجرد - غلطانة (فيديو كليب حصري,Saad Lamjarred | سعد لمجرد,417513549 views,https://www.youtube.com/watch?v=ZulwKDO-6B4,4,Saad Lamjarred - LM3ALLEM (Exclusive Music Video) |  (سعد لمجرد - لمعلم (فيديو كليب حصري,10,"Saad Lamjarred,GHALTANA,غلطانة,سعد لمجرد,saad lamjarred | سعد لمجرد,أنا ماشي ساهل,UC9hJ,saad lamjarred 2016,سعد لمجرد 2016,ghaltana,سعد غلطانة,saad ghaltana,ghaltana saad,غلطانة سعد لمجرد,سعد لمجرد غلطانة,saad lamjarred ghaltana,ghaltana saad lamjarred,غلطانة سعد المجرد,saad,سعد المجرد غلطانة,saad lmjarad,غلطانه,saad lamjared,اغنية غلطانة,sa3d lamjarred 2016,xyzfc,Saad Lamjarred 2017,أغنية سعد المجرد الجديدة,Let Go,حصريا 2017,Saad Lamjarred Music",https://i.ytimg.com/vi/ZulwKDO-6B4/maxresdefault.jpg
+Saad Lamjarred - Ana Machi Sahel (EXCLUSIVE Music Video) | (سعد لمجرد - انا ماشي ساهل (حصريأ,Saad Lamjarred | سعد لمجرد,265673420 views,https://www.youtube.com/watch?v=ucNF2GHhk2k,4,Saad Lamjarred - LM3ALLEM (Exclusive Music Video) |  (سعد لمجرد - لمعلم (فيديو كليب حصري,10,"MACHI SAHEL,SAAD LAMJARRED,NEW SINGLE SAAD LAMJARRED 2016,saad,سعد المجرد,nta m3alem,Saad Lamjarred | سعد لمجرد,سعد لمجرد,lamjarred,UC9hJ,saad lamjarred 2016,machi sahel,ana machi sahel,saad lamjarred,أنا ماشي ساهل,ماشي ساهل,ساهل,انا ماشي ساهل,saad lamjarred ana machi sahel,ana machi sahl,ana machi sahal,sa3d lamjarred 2016,سعد المجرد 2016,سعد المجرد انا ماشي ساهل,machi sahl,xyzfc,Saad Lamjarred Music,حصريا 2017,Let Go,أغنية سعد المجرد الجديدة",https://i.ytimg.com/vi/ucNF2GHhk2k/maxresdefault.jpg
+The Insane Science of Neutron Stars [4K],SEA,1895885 views,https://www.youtube.com/watch?v=qX6h72IyKSo,4,08 Digifunk - DivKid   ~ MIXED,28,"Sea1997,Sea,Space,astronomy,science,M1,Crab Nebula,Neutron Stars,Black Holes,Supernova,Gamma-Ray Burst,Pulsar,Radio Pulsar,X-Ray Pulsar,Binary System,X-Ray Binary,Binary Neutron Stars,Accretion,Accretion-Powered Pulsars,Millisecond Pulsars,Recycled Pulsars,Magnetars,Soft Gamma-Ray Repeaters,Anomalous X-Ray Pulsars,Starquake,Kilonova,Free Quarks,Up Quarks,Quark Matter,Strange Matter,Strange Star,Strangelet,Thorne-Żytkow Object,Hybrid Star,Down Quark,TOV",https://i.ytimg.com/vi/qX6h72IyKSo/maxresdefault.jpg
+Luis Fonsi - Despacito ft. Daddy Yankee,LuisFonsiVEVO,8991339433 views,https://www.youtube.com/watch?v=kJQP7kiw5Fk,4,08 Digifunk - DivKid   ~ MIXED,10,"Luis,Fonsi,Despacito,UMLE,Latino,Latin,Pop,Luis Fonsi,Daddy Yankee,Music Video,Oficial,Official Music Video,#Despacito,Zuleyka Rivera,Super model,Miss Universe,Puerto Rico,한글자막,日本語字幕,subtítulos en español,Türkçe Altyazılı,Phụ đề tiếng Việt,Subtitles in Tagalog,Teks dalam Bahasa Indonesia,उपशीर्षक हिंदी में,Sarikata Dalam Bahasa Malaysia,คำบรรยายภาษาไทย,ルイス・フォンシ,루이스 폰시,路易斯方辛,路易斯冯西",https://i.ytimg.com/vi/kJQP7kiw5Fk/maxresdefault.jpg
+ambient radio // dreamscape music to escape to,dreamscape,72405 views,https://www.youtube.com/watch?v=QmAbRBjcbY4,4,15 Minute Relaxing Meditation Music (Ambient Meditation Music) - SERATMOS,10,"dreamscape,dreamscape music,electronic music,sad electronic music,ambient,future garage,chill electronic,chill music,dark electronic,live ambient music,24/7 ambient stream,ambient music live,dreamscape radio,ambient radio,electronic ambient live,chill music live stream,dark ambient live,music to sleep to,sad ambient,ambient music station,live electronic music,music to study to,music for studying,deep focus music,background,24/7,on repeat,mix",https://i.ytimg.com/vi/QmAbRBjcbY4/maxresdefault_live.jpg
+15 Minute Stress Relief Meditation Music – Calm Your Nerves Instantly (Ambient Meditation Music),Seratmos,509 views,https://www.youtube.com/watch?v=EIZ_CiT27QQ,4,15 Minute Relaxing Meditation Music (Ambient Meditation Music) - SERATMOS,10,"Ambient Music,Focus Music,meditation music,calm music,relax music,study music,Peaceful Music,sleep music,Relaxing Music,meditation,calming music,spa music,anxiety,Stress Relief,Healing Music,Mindfulness Meditation,Stress Relief Music,Soothing Sounds,relaxing meditation music for stress relief",https://i.ytimg.com/vi/EIZ_CiT27QQ/maxresdefault.jpg
+OceanXplorers: Giants of the Deep with James Cameron (Full Episode) | National Geographic,National Geographic,1591791 views,https://www.youtube.com/watch?v=1QeMXEm-BNQ,4,Our Planet | Coastal Seas | FULL EPISODE | Netflix,24,"National Geographic,Nat Geo,Natgeo,Animals,Wildlife,Science,Explore,Discover,Survival,Nature,Documentary,Perpetual Planet Nat Geo,Photography,Ocean Xplorers,Giants,James Cameron,Ocean Explorers National Geographic,Oceanxplorers,Oceanxplorers James Cameron,Scientific Research,Exploration,Ocean's Mysteries,Ocean Mysteries Documentary,Life Of Sperm Whales,Hidden Prey,Atlantic Mystery,Atlantic Sperm Whale,Atlantic Ocean,Full Episodes,Deep Sea,Sperm Whale Research",https://i.ytimg.com/vi/1QeMXEm-BNQ/maxresdefault.jpg
+Our Planet | Forests | FULL EPISODE | Netflix,Netflix,47587022 views,https://www.youtube.com/watch?v=JkaxUblCGz0,4,Our Planet | Fresh Water | FULL EPISODE | Netflix,24,"education,netflix education,documentary,natural beauty,nature,forest,bald eagles,hunting dogs,Siberian tigers,climate change,ambitious documentary,netflix",https://i.ytimg.com/vi/JkaxUblCGz0/maxresdefault.jpg
+The Strangest Creatures of the Ocean | BBC Earth,BBC Earth,5829637 views,https://www.youtube.com/watch?v=oaJIkGhAf7U,4,Our Planet | Fresh Water | FULL EPISODE | Netflix,15,"bbc documentary,bbc,bbcearth,bbc earth,deep ocean,deep sea,deep sea creatures,natural history,blue planet deep sea,blue planet ii,blue planet 2,blue planet,deep sea creatures caught on camera,ocean life and nature documentary,angler fish,deep sea creature,strange creatures,deep sea fish,scary deep sea creatures,deep sea documentary,deep sea anglerfish,deep sea exploration,deep sea oddities,deep sea creatures footage,deep sea creatures documentary",https://i.ytimg.com/vi/oaJIkGhAf7U/maxresdefault.jpg
+Ember,Tony Anderson - Topic,941963 views,https://www.youtube.com/watch?v=RMMgghTwvgo,5,background,10,"Tony Anderson,Ember",https://i.ytimg.com/vi/RMMgghTwvgo/maxresdefault.jpg
+Orion Conquest Series | Grand Finals Day 2 | #godlike #gdr #rntx #TR #OG,ORION ESPORTS,207501 views,https://www.youtube.com/watch?v=q2aFJ_pj2Dc,5,background,20,"ORION ESPORTS,Bgmi",https://i.ytimg.com/vi/q2aFJ_pj2Dc/maxresdefault_live.jpg
+Dark Souls - The Firelink Shrine Bonfire,Maestro Virgoreo,207747 views,https://www.youtube.com/watch?v=gg626me8mxA,5,Dark Souls 2 OST - Majula + Ambience - 1 HOUR,20,"Dark Souls: Remastered,Dark Souls,Remastered,Dark,Souls,Firelink Shrine,Bonfire,Firelink,Shrine,Instrumental,Ambience,Music,Visual,Relaxing,Peaceful,Rest,RPG,Gaming,Soundtrack,Audio,Firelink Shrine Song,Firelink Shrine Music,Extended,Theme",https://i.ytimg.com/vi/gg626me8mxA/maxresdefault.jpg
+Dark Souls 2 OST - Majula - 1 HOUR,AmeRain,648920 views,https://www.youtube.com/watch?v=z0nZAXyF2BU,5,Dark Souls 2 OST - Majula + Ambience - 1 HOUR,10,"dark souls 2 ost,dark souls 2 hub music,dark souls 2 majula,dark souls 2 ost majula,dark souls 2 majula extended,dark souls 2 majula 1 hour,dark souls 2 majula hour loop,majula,majula song,majula music,dark souls 2 majula music,majula ost dark souls 2,majula ost,majula music hour,majula music ds2,dark souls 2 ost majula extended,dark souls 2 ost majula hour,dark souls 2 ost majula loop",https://i.ytimg.com/vi/z0nZAXyF2BU/maxresdefault.jpg
+Unraveling the Mysteries of Dark Energy with NASA's WFIRST,NASA Goddard,58079 views,https://www.youtube.com/watch?v=wnSVBLXaoO8,5,Large Quasar Groups,28,"NASA,WFIRST,Galaxy,Astrophysics,Supernova,Dark Energy,Redshift,Universe,Scott Wiessinger,space,telescope,galaxies",https://i.ytimg.com/vi/wnSVBLXaoO8/hqdefault.jpg
+Artist’s impression of two white dwarf stars merging and creating a Type Ia supernova,European Southern Observatory (ESO),21176 views,https://www.youtube.com/watch?v=m1Wl_UtTEj0,5,Large Quasar Groups,28,"ESO,European Southern Observatory,Europe,science,universe,space,Henize 2-428,planetary nebula,Nebula (Celestial Object Category)",https://i.ytimg.com/vi/m1Wl_UtTEj0/maxresdefault.jpg
+Sean Carroll  |  The Passage of Time & the Meaning of Life,The Long Now Foundation,906170 views,https://www.youtube.com/watch?v=7BH6XCRZad8,5,What's the Hottest Place In the Universe?,28,,https://i.ytimg.com/vi/7BH6XCRZad8/maxresdefault.jpg
+Fluffy Goes To India | Gabriel Iglesias,Gabriel Iglesias,71171305 views,https://www.youtube.com/watch?v=ux8GZAtCN-M,5,Saad Lamjarred - GHALTANA (EXCLUSIVE Music Video) | (سعد لمجرد - غلطانة (فيديو كليب حصري,23,"gabriel iglesias,fluffy,gabriel fluffy iglesias,jokes,comedy,funny,stand up comedy,india",https://i.ytimg.com/vi/ux8GZAtCN-M/hqdefault.jpg
+Elissa & Saad Lamjarred - Min Awel Dekika [Official Video] (2022) / اليسا وسعد لمجرد - من أول دقيقة,Elissa,596304307 views,https://www.youtube.com/watch?v=O--o-O-ABBw,5,Saad Lamjarred - Ana Machi Sahel (EXCLUSIVE Music Video) | (سعد لمجرد - انا ماشي ساهل (حصريأ,10,"elissa,Elissa,elisa,اليسا,إليسا,elissa music,elissa singer,saad lmajarred,saad lmjarred,saad lmjarrad,sa3d lamjarred,سعد لمجرد,Sa3d Lamjarred,Saad Lmjarad,سعد المجرد,sa3d lmjarrad,sa3d mjarrad,min awel dekika,men awel dekika,min awal dakika,men awal dakika,min awel de2i2a,men awel de2i2a,elissa and saad,elissa saad,saad elissa,اليسا وسعد,اليسا وسعد لمجرد,wedding songs,اغاني حب 2022,اغاني حب,من اول دقيقة,من أول دقيقة,elissa 2022",https://i.ytimg.com/vi/O--o-O-ABBw/maxresdefault.jpg
+Engine Black Holes: The Largest Objects in the Universe,SEA,628146 views,https://www.youtube.com/watch?v=lLt9i1Z4Skw,5,The Insane Science of Neutron Stars [4K],28,"SEA,Space,Astronomy,Science,Universe,Black Holes,Supermassive Black Holes,Big Bang,Engine Black Hole,James Webb Telescope,Cosmic Dawn,Population III Star,Supernova,Stellar Black Hole,Accretion,Disk,Eddington Limit,Primordial Black Hole,Direct Collapse Black Hole,Webb,Infrared,CEERS,Redshift,Quasar,Galaxy
+Mergers,Gravitational Waves,ZS7,LISA,Chandra,TON-618,M-87,Holmberg 15A,Abell 1201,Phoenix A,Big Crunch,End of the Universe,Hawking Radiation,Heat Death,2025",https://i.ytimg.com/vi/lLt9i1Z4Skw/maxresdefault.jpg
+KAROL G - Ivonny Bonita (Official Video),KarolGVEVO,12970702 views,https://www.youtube.com/watch?v=YcBUfrOguRQ,5,Luis Fonsi - Despacito ft. Daddy Yankee,10,"karol,karolg,bichota,si antes te hubiera conocido,sathc,latina foreva,latina forever,ivonny,bonita,la reina presenta,papasito,dile luna,cuando me muera te olvido,cmmto,coleccionando heridas,marco antonio solis,el buki,un gatito me llamo,amiga mia,bandida entrenada,ese hombre es malo,su boca la amo,verano rosa,feid,no puedo vivir sin el,tu perfume,fkn movie,mariah angeliq,se puso linda,viajando por el mundo,manu chao,tropicoqueta",https://i.ytimg.com/vi/YcBUfrOguRQ/maxresdefault.jpg
+"Luis Fonsi, Zé Neto & Cristiano, Thyy - Por Isso Que Eu Bebo",LuisFonsiVEVO,17048586 views,https://www.youtube.com/watch?v=z1Gr0fulmXk,5,Luis Fonsi - Despacito ft. Daddy Yankee,10,"Luis,Fonsi,Neto,Cristiano,Thyy,Por,Isso,Que,Bebo,UMLE,Latino,Latin,Pop",https://i.ytimg.com/vi/z1Gr0fulmXk/maxresdefault.jpg
+🚨 LIVE: TWO OWLETS HATCHED 🐣🐣 | Barred Owl Nest Cam,Collins Creek Critters,556138 views,https://www.youtube.com/watch?v=iLNXliI0dAI,5,ambient radio // dreamscape music to escape to,15,"bared owl,barn owl",https://i.ytimg.com/vi/iLNXliI0dAI/maxresdefault_live.jpg
+Surat Yasin Maher Al Muaiqly | سورة يس  - الشيخ ماهر المعيقلي,Al Sheikh Maher Bin Hamad Al Muaiqly | الشيخ ماهر بن حمد المعيقلي,15291140 views,https://www.youtube.com/watch?v=5xCG4jRLsLc,5,ambient radio // dreamscape music to escape to,10,"ماهر المعيقلي,maher al mueaqly ماهر المعيقلي,المعيقلي,سورة,maher al muaiqly,القران الكريم بصوت ماهر المعيقلي,quran kareem,ماهر المعقلي قران,قران بصوت ماهر المعقلي,القران الكريم,سورة الكهف,سورة الكهف مكتوبة,قراءه سورة الكهف,سورة الكهف ماهر,سورة الكهف كاملة,سورة الكهف روعة,سورة الكهف تلاوة جديدة,سورة الكهف صوت جميل,سورة الكهف مجوده,الكهف,al kahf,quran,سورة الكهف للشيخ,القرآن الكريم,surah al kahf,surah",https://i.ytimg.com/vi/5xCG4jRLsLc/maxresdefault.jpg
+15 Minute Calming Meditation Music (Ambient Meditation Music) - SERATMOS,Seratmos,120 views,https://www.youtube.com/watch?v=QhFQUmplLOQ,5,15 Minute Stress Relief Meditation Music – Calm Your Nerves Instantly (Ambient Meditation Music),10,"meditation music,ambient music,instrumental music,relaxing music,calming music,chillout music,atmospheric music,spa music,new age music,music for relaxation,yoga music,mindfulness music,peaceful music,meditation sounds,short meditation music,stress relief music,healing music,spiritual music,zen music,soundscape,background music",https://i.ytimg.com/vi/QhFQUmplLOQ/maxresdefault.jpg
+Meet the Explorers | OceanXplorers | National Geographic,National Geographic,27800 views,https://www.youtube.com/watch?v=SgBIcWsrGcU,5,OceanXplorers: Giants of the Deep with James Cameron (Full Episode) | National Geographic,24,"national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,perpetual planet nat geo,photography,Specialist,OceanX,Technology,Advanced Research,Ship,Explorer,Advanced Technology,Highly Talented Specialist,Aboard,Ocean Exploration,Earth,Exploration,Discovery,National Geographic,Disney+,Hulu,Meet the Explorers,Ocean Xplorers,NatGeo Exploration,Exploring videos,Marine Life,NatGeo Explorers,Xplorers,Exploring 4K",https://i.ytimg.com/vi/SgBIcWsrGcU/maxresdefault.jpg
+Around the World in 10 Minutes | Relaxing Nature Footage | OceanXplorers,National Geographic,355209 views,https://www.youtube.com/watch?v=RLfNgIDUnoE,5,OceanXplorers: Giants of the Deep with James Cameron (Full Episode) | National Geographic,24,"National Geographic,Nat Geo,Natgeo,Animals,Wildlife,Science,Explore,Discover,Survival,Nature,Culture,Documentary,Perpetual Planet Nat Geo,Photography,Exploring video,Mysteries of the Ocean,Ecosystem,Ocean Experts,NatGeo Explorers,Ocean Xplorers Nat Geo,Around the World,10 Minutes,Nature Footage,Ocean Xplorers,oceanxplorers disney,Around the World in 10 Minutes,Relaxing Nature Footage,Arctic Ocean,James Cameron",https://i.ytimg.com/vi/RLfNgIDUnoE/maxresdefault.jpg
+Our Planet | One Planet | FULL EPISODE | Netflix,Netflix,37182162 views,https://www.youtube.com/watch?v=GfO-3Oir-qM,5,Our Planet | Forests | FULL EPISODE | Netflix,24,"education,netflix education,documentary,our planet,baby animals,babies,baby,our planet Netflix,nature,planet earth,blue planet,earth,wild animals,environment,climate change,global warming,nat geo,national geographic,family,animals,elephant,tiger,gorilla,eagle,penguin,wildebeest,pelican,dogs,cute,cute animals,cute babies",https://i.ytimg.com/vi/GfO-3Oir-qM/maxresdefault.jpg
+Wild Rusia: Siberia | Nat Geo,National Geographic Latinoamérica,33097597 views,https://www.youtube.com/watch?v=vXGWaUZjDAQ,5,Our Planet | Forests | FULL EPISODE | Netflix,19,"siberia animales,animales de Rusia,flora y fauna de siberia rusia,animales carnivoros de rusia,animales en peligro de extincion en rusia,tigre siberiano,golomianka,flora de siberia,que animales viven en siberia,como es Rusia,Rusia,rusia mapa,rusia continente,clima de rusia,como es rusia actualmente,como es rusia para vivir,siberia ciudad,siberia mapa,siberia clima,siberia gente,aprendizaje,naturaleza,leones vs hienas a muerte",https://i.ytimg.com/vi/vXGWaUZjDAQ/maxresdefault.jpg
+Nothing About The Mariana Trench Is Normal... Here's Why,BeyondTheBlue,1803446 views,https://www.youtube.com/watch?v=NKBkBM4WWaQ,5,The Strangest Creatures of the Ocean | BBC Earth,22,,https://i.ytimg.com/vi/NKBkBM4WWaQ/hqdefault.jpg
+The Insane Biology of: The Octopus,Real Science,14915330 views,https://www.youtube.com/watch?v=mFP_AjJeP-M,5,The Strangest Creatures of the Ocean | BBC Earth,28,,https://i.ytimg.com/vi/mFP_AjJeP-M/maxresdefault.jpg
+Tony Anderson - Ember (Sascha Kirschtein mix),Alexander Bukhkholts,7485913 views,https://www.youtube.com/watch?v=kSThrKGn9EU,6,Ember (12548)-15738Tony AndersonEmber,10,"Sascha Kirschtein,RAIN,Tony Anderson",https://i.ytimg.com/vi/kSThrKGn9EU/maxresdefault.jpg
+Beyond the Observable Universe,SEA,2973014 views,https://www.youtube.com/watch?v=mty0srmLhTk,6,Ember (12548)-15738Tony AndersonEmber,28,"Sea1997,Sea,Space,astronomy,science,this,beyond the cosmic horizon,atoms,webb telescope,shape of the universe,positive curvature,negative curvature,hyperbolic curvature,flat universe,critical density,Omega,WMAP,Planck,Multiply Connected,Torus,Hyper Torus,Donut Universe,Doughnut,simply connected,CMB,Cosmic,Microwave,Background,observable,cosmic inflation,big bang,singularity,quantum,dark energy,gravity,cosmic web,shouldn't exist,big crunch,toroidal universe",https://i.ytimg.com/vi/mty0srmLhTk/maxresdefault.jpg
+"Silver Aim, Radiant Skins 😭| #valorantlivestream",,,https://www.youtube.com/watch?v=pcAfR7GJ-m4,6,Orion Conquest Series | Grand Finals Day 2 | #godlike #gdr #rntx #TR #OG,,,
+🔴 LIVE 24/7 | Christian Hymns & Worship Music | Soaking Worship | Prayer & Meditation Music,Deep Worship with Jesus,12214 views,https://www.youtube.com/watch?v=PFUA-ejDrIw,6,Orion Conquest Series | Grand Finals Day 2 | #godlike #gdr #rntx #TR #OG,10,"24/7 piano worship music for prayer & meditation,instrumental prayer worship and soaking music,christian meditation music,christian instrumental worship music with rain,deep worship meditation music,non stop soaking worship music,instrumental soaking worship music,prayer and meditation music,christian harmonieschristian meditation music,instrumental worship music for prayer,soaking worship music holy spirit,christian worship music,worship music christian",https://i.ytimg.com/vi/PFUA-ejDrIw/hqdefault_live.jpg
+Dark Souls - The Firelink Shrine Bonfire | Extended for 10 Hours,Maestro Virgoreo,2760 views,https://www.youtube.com/watch?v=SQj0kT_X6D4,6,Dark Souls - The Firelink Shrine Bonfire,20,,https://i.ytimg.com/vi/SQj0kT_X6D4/maxresdefault.jpg
+Dystopian Dark Ambient Radio 🌑 Live 24/7 Focus Soundscape,sonocapsule,3798 views,https://www.youtube.com/watch?v=DOUEdX_MHKw,6,Dark Souls - The Firelink Shrine Bonfire,10,"dark ambient,ambient music,sleep music,focus music,liminal soundscape,soundscape,study music,cinematic ambient,original ambient,immersive ambient,sci-fi ambient,nocturnal ambience,dark ambient soundscape,deep focus ambient,relaxing soundscape,ambient for studying,ambient for sleep,meditative music,background music",https://i.ytimg.com/vi/DOUEdX_MHKw/maxresdefault_live.jpg
+Prepare to Vibe: Relaxing Dark Souls music (w/ ambience),Cry Café,589554 views,https://www.youtube.com/watch?v=9j8PyBhLUaE,6,Dark Souls 2 OST - Majula - 1 HOUR,10,"dark souls,dark souls ost,dark souls music,relaxing dark souls,relaxing,ambient dark souls,chill souls,dark souls chill,dark souls 2,demons souls remake ost,ds3,prepare to chill dark souls,chilling souls,dark souls music mix,dark souls ambience,soulsborne,fromsoft music,dark souls lofi,dark souls mix,souls mix,soulsborne ost,relaxing demon souls music,demons souls,demons souls remake,from software,kings field ost,calm dark souls",https://i.ytimg.com/vi/9j8PyBhLUaE/maxresdefault.jpg
+What Life Was Actually Like on the Oregon Trail in 1850s America | History for Sleep,Henry’s History for Sleep,155098 views,https://www.youtube.com/watch?v=GLUBFSoXUcE,6,Dark Souls 2 OST - Majula - 1 HOUR,22,"History for Sleep,Boring history for sleep,sleep history,bedtime history,relaxing history,calm history narration,history to fall asleep,sleep documentary,historical storytelling",https://i.ytimg.com/vi/GLUBFSoXUcE/maxresdefault.jpg
+This Is the Scariest Place in The Universe,Kurzgesagt – In a Nutshell,6333151 views,https://www.youtube.com/watch?v=yDAAlojz8NU,6,• Unraveling the Mysteries of Dark Energy wi...,27,"kurzgezagt,kurzgesatg,kurzgsagt,kurzgessagt,kurzgesagtz,kurzgazagt,kurzgesaagt,curzgesagt,kurzgesakt,kurzgesaht,kurzgesgat,kurzgessat,krzgesagt,kurgesagt,kurzgesaght,kurtzgesagt,kurzgsat,kurzsagt,kurz,kurg,kurs,kuzz,curz,krz,kurzz,kurzt,kurzg,kgs,ksg,kgz,kszt,krgs,kzgs,kzs,krs",https://i.ytimg.com/vi/yDAAlojz8NU/maxresdefault.jpg
+How We Make Antimatter,Veritasium,6086530 views,https://www.youtube.com/watch?v=jjp3WC8Unj8,6,• Unraveling the Mysteries of Dark Energy wi...,27,"veritasium,science,physics,Veritasium,theoretical physics,dirac,einstein,quantum mechanics,general relativity,negative energy,anti-universe,antimatter,speed of light,atoms,the problem of time,time,unification,grand unification theory,theory of everything,heisenberg,pauli,quantum,quantum physics,cern,cern antimatter factory,lhc,large hadron collider,cpt symmetry,cpt,charge,parity,penning trap,penning,bomb,angels and demons,space",https://i.ytimg.com/vi/jjp3WC8Unj8/maxresdefault.jpg
+Minecraft Soothing Scenes – Relaxing Fireplace,Minecraft,4178856 views,https://www.youtube.com/watch?v=FqnAV6tkwzA,6,• Artist’s impression of two white dwarf sta...,20,"Relaxing,chill,nature,snow,water,ocean,rain,fire,fireplace,beach",https://i.ytimg.com/vi/FqnAV6tkwzA/maxresdefault.jpg
+Tribute to ESO's Unsung Heroes,European Southern Observatory (ESO),1211 views,https://www.youtube.com/watch?v=deK7BO1yWz8,6,• Artist’s impression of two white dwarf sta...,28,"ESO,European Southern Observatory,science,scientists,Unsung Heroes,special,announcement",https://i.ytimg.com/vi/deK7BO1yWz8/maxresdefault.jpg
+The Passage of Time and the Meaning of Life | Sean Carroll,The Long Now Foundation,398395 views,https://www.youtube.com/watch?v=EntaPoSEXog,6,Sean Carroll  |  The Passage of Time & the Meaning of Life,28,"Evolution,Science,Futures,Past,Time,Physics,Universe,Astronomy,Cosmology,Big Bang,Black Holes,Entropy,Asymmetry,Complexity,Thermodynamics,Life,Cathedral,Galileo,Newton,Einstein,Hawking",https://i.ytimg.com/vi/EntaPoSEXog/maxresdefault.jpg
+The problem with pretending quantum mechanics makes sense | Sean Carroll,Big Think,1066362 views,https://www.youtube.com/watch?v=u9YiM7LZ6b0,6,Sean Carroll  |  The Passage of Time & the Meaning of Life,27,"Education,Educational Videos,Videos,Faster smarter,big think,bigthink",https://i.ytimg.com/vi/u9YiM7LZ6b0/maxresdefault.jpg
+Fluffy Loves India | Gabriel Iglesias,Gabriel Iglesias,22869369 views,https://www.youtube.com/watch?v=nAULsoAQn2g,6,Fluffy Goes To India | Gabriel Iglesias,23,"gabriel iglesias,gabriel fluffy iglesias,stand up comedy,fluffy,comedy,funny,jokes,funny videos,india,gabriel iglesias racist gift basket,gabriel iglesias magic mike scene,gabriel iglesias full show,gabriel fluffy iglesias one show fits all,gabriel fluffy iglesias car collection,gabriel fluffy iglesias india",https://i.ytimg.com/vi/nAULsoAQn2g/maxresdefault.jpg
+Relaxing Jazz In Lakeside Cafe For Study & Focus | Smooth Jazz Music For Stress Relief,Quiet Outdoor Jazz,109435 views,https://www.youtube.com/watch?v=SfwfeOv_L5M,6,Fluffy Goes To India | Gabriel Iglesias,22,"quiet outdoor jazz,Soft Jazz,Smooth Jazz,Relaxing Jazz,Relaxing Jazz Background Music,Nature Therapy,Nature Sounds Ambience,Jazz Background Music,cozy jazz,Gentle Jazz Music,Soft Jazz Music,nature therapy,Outdoor Coffee Shop,Cafe Outdoor Jazz,calm music,Gentle Jazz Ambience,jazz playlist,Warm Morning Jazz,Spring Jazz,Jazz Coffee Shop,Relaxing Jazz In Lakeside Cafe,Smooth Jazz Music,April Jazz,Lakeside Cafe Jazz",https://i.ytimg.com/vi/SfwfeOv_L5M/maxresdefault_live.jpg
+øneheart x reidenshi - snowfall (slowed) (1 hour loop),dreamscape,43865367 views,https://www.youtube.com/watch?v=_r0vlyp33pw,6,Elissa & Saad Lamjarred - Min Awel Dekika [Official Video] (2022) / اليسا وسعد لمجرد - من أول دقيقة,10,"dreamscape,dreamscape music,electronic music,sad electronic music,sad edm,sad beats,dream scape,ambient,future garage,chill electronic,chill music,dark electronic,øneheart & reidenshi - snowfall (slowed) (1 hour loop),øneheart & reidenshi - snowfall slowed 1 hour loop,oneheart & reidenshi - snowfall (slowed) (1 hour loop),oneheart & reidenshi - snowfall slowed 1 hour loop,oneheart & reidenshi - snowfall 1 hour,oneheart & reidenshi - snowfall 1 hour loop",https://i.ytimg.com/vi/_r0vlyp33pw/maxresdefault.jpg
+Norway 4K - Scenic Relaxation Film with Calming Music,Scenic Relaxation,25488039 views,https://www.youtube.com/watch?v=CxwJrzEdw1U,6,Elissa & Saad Lamjarred - Min Awel Dekika [Official Video] (2022) / اليسا وسعد لمجرد - من أول دقيقة,22,"norway 4k,norway,norway relaxation,norway relaxation film,relaxation film,calming music,stress relief,nature video,relax music",https://i.ytimg.com/vi/CxwJrzEdw1U/maxresdefault.jpg
+Primordial black hole formation with full numerical relativity: Accretion and direct collapse,GRChombo,1337 views,https://www.youtube.com/watch?v=fqEBlCybF8I,6,"Why ""Engine Black Holes"" Are the Strangest Objects in the Universe",28,,https://i.ytimg.com/vi/fqEBlCybF8I/maxresdefault.jpg
+ENGINEERING EARTH:  Sci-fi Solutions to Earth's Problems | 4K Documentary,melodysheep,3497532 views,https://www.youtube.com/watch?v=rN5f72lhJz8,6,"Why ""Engine Black Holes"" Are the Strangest Objects in the Universe",28,,https://i.ytimg.com/vi/rN5f72lhJz8/maxresdefault.jpg
+Hans Zimmer - Interstellar (Soft Sounds),dhe Perissann,2536792 views,https://www.youtube.com/watch?v=d93FPnEpkvI,6,KAROL G - Ivonny Bonita (Official Video),10,"the per,dhe per,the peris,dhe peris,the persan,dhe persan,the persa,dhe persa,the perian,dhe perian,the perisa,dhe perisa,the perissa,dhe perissa,the perisan,dhe perisan,the perissann,soft sond,soft soun,sof sound,sof sond,space sond,space soun,spac sound,spac sond,soft piyano,sof piano,sof piyano,relaks music,slep music,new clasic music,klassic music,soting music,Hans Zimmer - Interstellar (Soft Sounds)",https://i.ytimg.com/vi/d93FPnEpkvI/maxresdefault.jpg
+Clair Obscur: Expedition 33 | Full Orchestral Session [Official Music Video],Sandfall Interactive,6116162 views,https://www.youtube.com/watch?v=4FIMsKKvBRM,6,KAROL G - Ivonny Bonita (Official Video),20,"expedition 33,jrpg,sandfall,kepler,clair obscur,orchestra,soundtrack,theme,gaming,game music,lorien testard",https://i.ytimg.com/vi/4FIMsKKvBRM/maxresdefault.jpg
+The Largest Star (Stephenson 2-18),SEA,4125195 views,https://www.youtube.com/watch?v=W9ME-WBlkeM,6,"Luis Fonsi, Zé Neto & Cristiano, Thyy - Por Isso Que Eu Bebo",28,"Sea,Space,OOTW,Out of this world,astronomy,science,STARS,largest star,biggest star,canis majoris,uy scuti,stephenson 2-18,largest stars,red giant,plasma,main sequence,biggest star in the universe,biggest star in the galaxy,supergiant,hypergiant,fusion,photosphere,solar radii,parallax,spectrum,luminosity formula,cluster,galaxy,documentary,largest star documentary,wolf rayet star,angular diameter",https://i.ytimg.com/vi/W9ME-WBlkeM/maxresdefault.jpg
+Austin Screech Owl Live Stream,Austin Screech Owl,215505 views,https://www.youtube.com/watch?v=LV5JuDcYkGg,6,🚨 LIVE: TWO OWLETS HATCHED 🐣🐣 | Barred Owl Nest Cam,15,"live owl cam,screech owls,eastern screen owls,owlets,Megascops asio,owl live stream,bird watching live,#EasternScreechOwl,#OwlCam,#WildlifeLive",https://i.ytimg.com/vi/LV5JuDcYkGg/maxresdefault_live.jpg
+🚨 LIVE: TWO OWLETS HATCHED 🐣🐣 | Barred Owl Nest Cam | Outside View,Collins Creek Critters,42141 views,https://www.youtube.com/watch?v=Gr_pTQgzHow,6,🚨 LIVE: TWO OWLETS HATCHED 🐣🐣 | Barred Owl Nest Cam,15,,https://i.ytimg.com/vi/Gr_pTQgzHow/maxresdefault_live.jpg
+الشيخ سعد الغامدي - سورة الفاتحة - آية الكرسي - سورة الإخلاص - سورة الفلق - سورة الناس مكررة 7 مرات,Tawba Channel | قناة توبة,100089 views,https://www.youtube.com/watch?v=kfWK3Fg4Uks,6,Surat Yasin Maher Al Muaiqly | سورة يس  - الشيخ ماهر المعيقلي,10,"سورة الفاتحة 7 مرات اية الكرسي 7 الاخلاص 7 الفلق 7 الناس 7 وقاية من الحسد والسحر و العين,سورة الفاتحة 7 مرات,سورة الفاتحة 7 مرات اية الكرسي 7 الاخلاص 7 الفلق 7 الناس 7,سورة الفاتحة 7 مرات اية الكرسي 7 الاخلاص 7 الفلق 7 الناس 7 وقاية من الحسد والسحر و العين احمد العجمي,سورة الفاتحة 7 مرات آية الكرسي 7 الاخلاص 7 الفلق 7 الناس وقاية من السحر والحسد والعين,سورة الفاتحة 7 مرات على الماء,سعد الغامدي سورة الفاتحة,سورة الاخلاص سعد الغامدي مكررة,سورة الاخلاص سعد الغامدي مكتوبة",https://i.ytimg.com/vi/kfWK3Fg4Uks/maxresdefault.jpg
+Surat Al Mulk Maher Al Muaiqly | سورة الملك  - الشيخ ماهر المعيقلي,Al Sheikh Maher Bin Hamad Al Muaiqly | الشيخ ماهر بن حمد المعيقلي,6808778 views,https://www.youtube.com/watch?v=Sp3wLZkk7cs,6,Surat Yasin Maher Al Muaiqly | سورة يس  - الشيخ ماهر المعيقلي,10,"ماهر المعيقلي,maher al mueaqly ماهر المعيقلي,المعيقلي,سورة,maher al muaiqly,القران الكريم بصوت ماهر المعيقلي,quran kareem,ماهر المعقلي قران,قران بصوت ماهر المعقلي,القران الكريم,سورة الكهف,سورة الكهف مكتوبة,قراءه سورة الكهف,سورة الكهف ماهر,سورة الكهف كاملة,سورة الكهف روعة,سورة الكهف تلاوة جديدة,سورة الكهف صوت جميل,سورة الكهف مجوده,الكهف,al kahf,quran,سورة الكهف للشيخ,القرآن الكريم,surah al kahf,surah",https://i.ytimg.com/vi/Sp3wLZkk7cs/maxresdefault.jpg
+🔴Makkah Live | مكة مباشر | الحرم المكي مباشر | قناة القران الكريم السعودية مباشر | مكه المكرمه,Hafiz Wazaif Network,150256 views,https://www.youtube.com/watch?v=kXKDxj1hTX8,6,15 Minute Calming Meditation Music (Ambient Meditation Music) - SERATMOS,27,,https://i.ytimg.com/vi/kXKDxj1hTX8/maxresdefault_live.jpg
+(No Ads) Reiki Music • Release Of Melatonin And Toxin • Get Rid Of All Negative Energy,Reiki Sleep Energy,12827 views,https://www.youtube.com/watch?v=LVoIehYY-5I,6,15 Minute Calming Meditation Music (Ambient Meditation Music) - SERATMOS,10,"Reiki Sleep Energy,Reiki Music,Release Of Melatonin And Toxin,Get Rid Of All Negative Energy,remove negative energy,meditation music,reiki healing music,sleep music,música reiki,relaxing music,healing sound,music to calm,anxiety relief,full body healing,stress,yoga,mindfulness,meditation,sleep meditation,deep sleep,no ads,stress relief,fall asleep fast,goodbye stress,melatonin,432hz,healing music",https://i.ytimg.com/vi/LVoIehYY-5I/maxresdefault_live.jpg
+Cursed Gold: A Shipwreck Scandal | Official Show Promo | National Geographic,National Geographic,27126 views,https://www.youtube.com/watch?v=NeDNwFDrvug,6,Meet the Explorers | OceanXplorers | National Geographic,24,"national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,perpetual planet nat geo,photography,New York Times,Tommy Thompson,BBC Studios,New York Times Bestseller,Cursed Gold,BBC,Shipwreck,Tommy,Scandal,Tons of Gold,Atlantic Ocean,Famous Shipwreck,Central America,True Story,Adventure,Deception,America,NatGeo Explorer,Prison Cell,Cursed,Gold,Shipwreck Scandal,Official Show,Promo,National Geographic",https://i.ytimg.com/vi/NeDNwFDrvug/maxresdefault.jpg
+Titanic: The Digital Resurrection (Full Episode) | SPECIAL | National Geographic,National Geographic,237188 views,https://www.youtube.com/watch?v=4RFUkJ31x5s,6,Meet the Explorers | OceanXplorers | National Geographic,24,"National Geographic,Nat Geo,Explore with Us,Discover,Survival 4k,Nature,Documentary Nat Geo,Photography 4k,History,Mystery,Titanic,James Cameron,The Titanic,Cutting Edge Tech,Undersea Scanning Project,3D Digital Models,Titanic: The Digital Resurrection,DOCUMENTARY SPECIAL,Full Episode,SPECIAL,Undersea Projects,Titanic Wreck,3D Titanic Model,Investigation,Boat,Ocean,Ship Wreck,boat crash,disaster,history documentary,history study,study,Atlantic Ocean",https://i.ytimg.com/vi/4RFUkJ31x5s/maxresdefault.jpg
+10 Minutes of Relaxing Ocean Sounds | HD Footage of Whales & Jellyfish | OceanXplorers,National Geographic,112605 views,https://www.youtube.com/watch?v=iNrPV5sEoCw,6,13,24,"national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,perpetual planet nat geo,photography,Ocean Xplorers,Explorers,Life at the Ocean,Marine Life,Exploring the Ocean,Nat Geo,Explore,Unknown World,Water,Exploring video,National Geographic,Freezing Cold,Marine Predators,Xplorer,Exploring 4K,Incredible Deep Sea Creatures,Disney+,Hulu,Xplorers,Relaxing Ocean Sounds,Footage of Marine Animals,Whales,Jellyfish",https://i.ytimg.com/vi/iNrPV5sEoCw/maxresdefault.jpg
+Bioluminescence lights up the water #OceanXplorers | National Geographic,National Geographic,24117 views,https://www.youtube.com/watch?v=FQ4oWwq5WBU,6,13,24,"national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,perpetual planet nat geo,photography,Ocean Xplorers,NatGeo Explorers,Life at the Ocean,Explorer,Marine Life,Exploring the Ocean,Nat Geo,Explore,Unknown World,Water,Exploring video,World,Below the Surface,National Geographic,Freezing Cold,Marine Predators,Luminescence,Exploring 4K",https://i.ytimg.com/vi/FQ4oWwq5WBU/maxresdefault.jpg
+Our Planet | Frozen Worlds | FULL EPISODE | Netflix,Netflix,44669986 views,https://www.youtube.com/watch?v=cTQ3Ko9ZKg8,6,Our Planet | One Planet | FULL EPISODE | Netflix,24,"education,netflix education,documentary,climate change,polar bears,walruses,seals,penguins,natural beauty,ambitious documentary,netflix",https://i.ytimg.com/vi/cTQ3Ko9ZKg8/maxresdefault.jpg
+Incredible 4K Nature Scenes Narrated By David Attenborough | BBC Earth,BBC Earth,16629692 views,https://www.youtube.com/watch?v=7ZhdXgRfxHI,6,Our Planet | One Planet | FULL EPISODE | Netflix,15,"bbc documentary,bbc,bbcearth,bbc earth,animal compilation,sir david attenborough,david attenborough,bbc earth david attenborough,4k video,wildlife documentary,bbc earth documentary,david attenborough voice,david attenborough planet earth,ultra high definition 4k,david attenborough documentary,seven worlds one planet,david attenborough sleep,animal compilation 4k,animal compilation 2024,planet earth,nature in 4k,david attenborough ocean,nature sounds",https://i.ytimg.com/vi/7ZhdXgRfxHI/maxresdefault.jpg
+Oso polar y perro de trineo | Nat Geo,National Geographic Latinoamérica,8815 views,https://www.youtube.com/watch?v=gHP7ePn2XaI,6,Wild Rusia: Siberia | Nat Geo,24,"aprendizaje,naturaleza,leones vs hienas a muerte",https://i.ytimg.com/vi/gHP7ePn2XaI/maxresdefault.jpg
+Misión Crítica: Campos de Batalla en la playa,National Geographic Latinoamérica,197602 views,https://www.youtube.com/watch?v=8or4h1MFi30,6,Wild Rusia: Siberia | Nat Geo,24,"misión crítica,campos de batalla en la playa,aprendizaje,naturaleza,leones vs hienas a muerte",https://i.ytimg.com/vi/8or4h1MFi30/maxresdefault.jpg
+What's inside this crater in Madagascar?,Vox,14990216 views,https://www.youtube.com/watch?v=h42QVfrUVFw,6,Nothing About The Mariana Trench Is Normal... Here's Why,25,"Vox.com,explain,explainer,vox,christophe haubursin",https://i.ytimg.com/vi/h42QVfrUVFw/maxresdefault.jpg
+Why Squids get Creepier the Deeper you Go,BeyondTheBlue,2636627 views,https://www.youtube.com/watch?v=2RQVjLbV0pI,6,Nothing About The Mariana Trench Is Normal... Here's Why,22,,https://i.ytimg.com/vi/2RQVjLbV0pI/maxresdefault.jpg
+Octopus Social Life (Full Episode) | Secrets of the Octopus | National Geographic,National Geographic,2695283 views,https://www.youtube.com/watch?v=p0RLERl3TmU,6,The Insane Biology of: The Octopus,24,"national geographic,nat geo,natgeo,animals,wildlife,science,explore,discover,survival,nature,culture,documentary,perpetual planet nat geo,photography,full episode,Octopus,Social Networkers,The Octopus,Nature video,Ultimate Loner,Octopus Secret,Life of the Octopus,Secrets of the Octopus,Social Network,Social Life,Full Episode,National Geographic,Marine videos,Octopus video,Marine life 4k",https://i.ytimg.com/vi/p0RLERl3TmU/maxresdefault.jpg
+The Insane Biology of: The Emperor Penguin,Real Science,887515 views,https://www.youtube.com/watch?v=3CRyGogDYJo,6,The Insane Biology of: The Octopus,28,,https://i.ytimg.com/vi/3CRyGogDYJo/maxresdefault.jpg
